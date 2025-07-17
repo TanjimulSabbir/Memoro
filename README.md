@@ -1,4 +1,4 @@
-# Memoro
+# MEMORO
 
 **Memoro** is a comprehensive personal growth and management app that brings together note-taking, to-do lists, reminders, health tracking, and money management in a single platform.
 
