@@ -1,8 +1,8 @@
-# Planiva
+# Memoro
 
-**Planiva** is a comprehensive personal growth and management app that brings together note-taking, to-do lists, reminders, health tracking, and money management in a single platform.
+**Memoro** is a comprehensive personal growth and management app that brings together note-taking, to-do lists, reminders, health tracking, and money management in a single platform.
 
-Managing different aspects of life often requires multiple apps, which can be cumbersome and inefficient. Planiva solves this by offering a unified solution to track your goals, plans, health, and finances easily and efficiently.
+Managing different aspects of life often requires multiple apps, which can be cumbersome and inefficient. Memoro solves this by offering a unified solution to track your goals, plans, health, and finances easily and efficiently.
 
 ## Features
 
@@ -16,13 +16,13 @@ Managing different aspects of life often requires multiple apps, which can be cu
 - Supports personal growth by combining multiple management tools in one app  
 
 
-## Why Planiva?
+## Why Memoro?
 
-Planiva aims to reduce the hassle of switching between different apps by integrating key personal management features into one user-friendly application. Whether you want to organize your day, track your habits, or manage your finances, Planiva has you covered.
+Memoro aims to reduce the hassle of switching between different apps by integrating key personal management features into one user-friendly application. Whether you want to organize your day, track your habits, or manage your finances, Memoro has you covered.
 
 ## Getting Started
 
-Follow these steps to run Planiva locally on your machine:
+Follow these steps to run Memoro locally on your machine:
 
 ### Prerequisites
 
@@ -33,8 +33,8 @@ Follow these steps to run Planiva locally on your machine:
 
 1. **Clone the repository:**
   ```bash
-   git clone https://github.com/TanjimulSabbir/planiva.git
-   cd planiva
+   git clone https://github.com/TanjimulSabbir/Memoro.git
+   cd Memoro
    npm install
    ```
 
@@ -55,7 +55,7 @@ npm run build
 ### 📬 Contact
 
 I started this project **on my own**, driven by passion and dedication.  
-If you’re interested in contributing or joining this mission to take **Planiva** to the next level and help turn this dream into reality, **you’re warmly welcome!**  
+If you’re interested in contributing or joining this mission to take **Memoro** to the next level and help turn this dream into reality, **you’re warmly welcome!**  
 
 ✨ **Let’s build something amazing together!** ✨
 
