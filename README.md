@@ -1,69 +1,67 @@
-# React + TypeScript + Vite
+# Planiva
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Planiva** is a comprehensive personal growth and management app that brings together note-taking, to-do lists, reminders, health tracking, and money management in a single platform.
 
-Currently, two official plugins are available:
+Managing different aspects of life often requires multiple apps, which can be cumbersome and inefficient. Planiva solves this by offering a unified solution to track your goals, plans, health, and finances easily and efficiently.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Note-taking with rich text support  
+- To-do lists for task organization  
+- **Reminders and alarms** to keep you on track with your plans and deadlines  
+- Health tracking to monitor habits, exercise, or medication schedules  
+- Money tracking for budgeting, expenses, and financial planning  
+- Easy categorization and tagging for all your notes and tasks  
+- Intuitive and clean user interface for seamless experience  
+- Supports personal growth by combining multiple management tools in one app  
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Why Planiva?
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+Planiva aims to reduce the hassle of switching between different apps by integrating key personal management features into one user-friendly application. Whether you want to organize your day, track your habits, or manage your finances, Planiva has you covered.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting Started
+
+Follow these steps to run Planiva locally on your machine:
+
+### Prerequisites
+
+- Node.js (version 14 or higher recommended)
+- npm (comes with Node.js) or yarn
+
+### Installation
+
+1. **Clone the repository:**
+  ```bash
+   git clone https://github.com/TanjimulSabbir/planiva.git
+   cd planiva
+   npm install
+   ```
+
+2. ***Start the development server:***
+  ```bash
+  npm run dev
+  ```
+
+3. ***Open the app:***  Open your browser and visit http://localhost:5173 (default Vite port)
+
+### Build for production
+
+```bash 
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 📬 Contact
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+I started this project **on my own**, driven by passion and dedication.  
+If you’re interested in contributing or joining this mission to take **Planiva** to the next level and help turn this dream into reality, **you’re warmly welcome!**  
+
+✨ **Let’s build something amazing together!** ✨
+
+📧 **Get in touch:** [tanjimulsabbir.dev@gmail.com](mailto:tanjimulsabbir.dev@gmail.com)
+
+---
+
+*Feel free to customize this README with screenshots, usage examples, or contribution guidelines!*
+
