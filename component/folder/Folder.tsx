@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { FilePlus, FolderPlus, Settings } from "lucide-react";
 import CreateFolder from "./CreateFolder";
+import FolderList from "./ShowFolder";
+import { getAllFolders } from "@/db/folder";
 
 export default function FolderSidebar() {
   const [showCreateFolder, setShowCreateFolder] = useState(false);
 
-  const refreshFolders = () => {
-    // your logic to reload folder list
+  const refreshFolders = async() => {
+    return await getAllFolders();
   };
 
   return (
@@ -28,7 +30,7 @@ export default function FolderSidebar() {
         <button
           title="Create Folder"
           className="p-2 hover:bg-gray-200 rounded"
-          onClick={() => setShowCreateFolder(prev => !prev)}
+          onClick={() => setShowCreateFolder((prev) => !prev)}
         >
           <FolderPlus size={24} className="text-gray-600" />
         </button>
@@ -45,7 +47,7 @@ export default function FolderSidebar() {
 
       {/* Show CreateFolder form if toggled */}
       {showCreateFolder && (
-        <div className="absolute inset-0 bg-white p-4 shadow-lg z-10 flex items-center justify-center">
+        <div className=" bg-white p-4 shadow-lg z-10 flex items-center justify-center">
           <CreateFolder
             onCreated={() => {
               refreshFolders();
@@ -56,7 +58,7 @@ export default function FolderSidebar() {
       )}
 
       {/* Folder List here */}
-      <div>{/* FolderList component */}</div>
+      <FolderList refreshFolders={refreshFolders} />
     </aside>
   );
 }

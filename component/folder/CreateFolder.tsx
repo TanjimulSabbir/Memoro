@@ -26,9 +26,9 @@ export default function CreateFolder({
           placeholder="New folder name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border px-2 py-0.5 rounded flex-grow"
+          className="border rounded flex-grow"
         />
-        <button type="submit" className="bg-blue-500 text-white rounded">
+        <button type="submit" onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)} className="bg-blue-500 text-white px-4 py-2 rounded">
           Create
         </button>
       </form>

@@ -10,6 +10,10 @@ export function addFolder(
   });
 }
 
+export function getAllFolders(): Promise<Folder[]> {
+  return db.folders.toArray();
+}
+
 export function getSubfolders(
   parentId: number | null = null
 ): Promise<Folder[]> {
