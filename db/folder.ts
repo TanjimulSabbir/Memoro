@@ -1,4 +1,5 @@
-import db, { Folder } from "./index";
+import { Folder } from "./dbTypes";
+import db from "./index";
 
 export function addFolder(
   folder: Omit<Folder, "id" | "createdAt">
@@ -17,4 +18,8 @@ export function getSubfolders(
 
 export function deleteFolder(id: number): Promise<void> {
   return db.folders.delete(id);
+}
+
+export function updateFolderName(id: number, name: string): Promise<number> {
+  return db.folders.update(id, { name });
 }
