@@ -1,5 +1,5 @@
 import { Folder } from "./dbTypes";
-import db from "./index";
+import db from "./db";
 
 export function addFolder(
   folder: Omit<Folder, "id" | "createdAt">

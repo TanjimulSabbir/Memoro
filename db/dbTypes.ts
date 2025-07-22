@@ -4,6 +4,14 @@ export interface Folder {
   name: string;
   createdAt: Date;
 }
+export interface FilesItem {
+  id?: number;
+  folderId: number | null;
+  name: string;
+  content: string;
+  createdAt: Date;
+}
+
 
 export interface Note {
   id?: number;

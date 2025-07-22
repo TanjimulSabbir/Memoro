@@ -1,5 +1,5 @@
 import { Note } from "./dbTypes";
-import db from "./index";
+import db from "./db";
 
 export function addNote(
   note: Omit<Note, "id" | "createdAt" | "updatedAt">
