@@ -1,41 +1,32 @@
-"use client";
-
 import { Folder } from "@/db/dbTypes";
-import { getAllFolders } from "@/db/folder";
-import React, { useEffect, useState } from "react";
+import { FolderIcon } from "lucide-react";
+import React from "react";
 
-export default function FolderList({
-  refreshFolders,
-}: {
-  refreshFolders?: () => Promise<Folder[]>;
-}) {
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchFolders() {
-      let fetchedFolders: Folder[] = [];
-      if (refreshFolders) {
-        fetchedFolders = await refreshFolders();
-      } else {
-        fetchedFolders = await getAllFolders();
-      }
-      setFolders(fetchedFolders);
-      setLoading(false);
-    }
-
-    fetchFolders();
-  }, []);
-
-  if (loading) return <p>Loading folders...</p>;
-
-  if (folders.length === 0) return <p>No folders found.</p>;
+export default function FolderList({ folders }: { folders: Folder[] }) {
+  if (!folders || folders.length === 0) {
+    return (
+      <div className="text-center text-muted-foreground py-10 text-sm">
+        <p className="text-gray-500">📂 No folders yet. Create one!</p>
+      </div>
+    );
+  }
 
   return (
-    <ul>
+    <ul className="space-y-2">
       {folders.map((folder) => (
-        <li key={folder.id} className="p-2 border-b">
-          {folder.name}
+        <li
+          key={folder.id}
+          className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition cursor-pointer group border"
+        >
+          <FolderIcon className="text-blue-500 w-5 h-5 group-hover:scale-110 transition" />
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold text-gray-800 group-hover:underline">
+              {folder.name}
+            </span>
+            <span className="text-xs text-gray-500">
+              Created: {new Date(folder.createdAt).toLocaleDateString()}
+            </span>
+          </div>
         </li>
       ))}
     </ul>

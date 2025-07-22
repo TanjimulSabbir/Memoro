@@ -4,8 +4,10 @@ import { useState } from "react";
 
 export default function CreateFolder({
   onCreated,
+  type,
 }: {
   onCreated?: () => void;
+  type: "folder" | "file";
 }) {
   const [name, setName] = useState("");
 
@@ -23,12 +25,16 @@ export default function CreateFolder({
         📁
         <input
           type="text"
-          placeholder="New folder name"
+          placeholder={`New ${type} name`}
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="border rounded flex-grow"
+          className="border h-9 rounded pl-2 flex-grow placeholder:text-sm"
         />
-        <button type="submit" onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)} className="bg-blue-500 text-white px-4 py-2 rounded">
+        <button
+          type="submit"
+          onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
+          className="bg-blue-500 text-white px-4 py-2 text-sm rounded"
+        >
           Create
         </button>
       </form>

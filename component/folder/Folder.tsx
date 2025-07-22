@@ -1,64 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FilePlus, FolderPlus, Settings } from "lucide-react";
 import CreateFolder from "./CreateFolder";
 import FolderList from "./ShowFolder";
 import { getAllFolders } from "@/db/folder";
+import { Folder } from "@/db/dbTypes";
 
 export default function FolderSidebar() {
-  const [showCreateFolder, setShowCreateFolder] = useState(false);
+  const [showCreate, setShowCreate] = useState({
+    file: false,
+    folder: false,
+  });
+  const [folders, setFolders] = useState<Folder[]>([]);
 
-  const refreshFolders = async() => {
-    return await getAllFolders();
+  const refreshFolders = async () => {
+    const res = await getAllFolders();
+    setFolders(res);
   };
 
+  useEffect(() => {
+    refreshFolders(); // Load folders on mount
+  }, []);
+
   return (
-    <aside className="border-r p-4 flex flex-col gap-4">
-      {/* Icon Buttons */}
-      <div className="flex justify-around space-x-5 mb-4">
-        {/* Create File Icon */}
-        <button
-          title="Create File"
-          className="p-2 hover:bg-gray-200 rounded"
-          onClick={() => alert("Create File clicked")}
-        >
-          <FilePlus size={24} className="text-gray-600" />
-        </button>
-
-        {/* Create Folder Icon */}
-        <button
-          title="Create Folder"
-          className="p-2 hover:bg-gray-200 rounded"
-          onClick={() => setShowCreateFolder((prev) => !prev)}
-        >
-          <FolderPlus size={24} className="text-gray-600" />
-        </button>
-
-        {/* Settings Icon */}
-        <button
-          title="Settings"
-          className="p-2 hover:bg-gray-200 rounded"
-          onClick={() => alert("Settings clicked")}
-        >
-          <Settings size={24} className="text-gray-600" />
-        </button>
+    <aside className="border-r h-full p-4 flex flex-col gap-6 bg-white shadow-sm w-72">
+      {/* Header Icons */}
+      <div className="flex justify-center items-center">
+        <IconButton
+          icon={<FilePlus size={20} />}
+          label="New File"
+          onClick={() => setShowCreate({ folder: false, file: true })}
+        />
+        <IconButton
+          icon={<FolderPlus size={20} />}
+          label="New Folder"
+          onClick={() => setShowCreate({ folder: true, file: false })}
+        />
+        <IconButton
+          icon={<Settings size={20} />}
+          label="Settings"
+          onClick={() => alert("Settings clicked!")}
+        />
       </div>
 
-      {/* Show CreateFolder form if toggled */}
-      {showCreateFolder && (
-        <div className=" bg-white p-4 shadow-lg z-10 flex items-center justify-center">
+      {/* Conditional Form */}
+      {(showCreate.folder || showCreate.file) && (
+        <div className="animate-fade-in bg-gray-50 p-3 rounded-lg border">
           <CreateFolder
             onCreated={() => {
               refreshFolders();
-              setShowCreateFolder(false);
+              setShowCreate({ folder: false, file: false });
             }}
+            type={showCreate.folder ? "folder" : "file"}
           />
         </div>
       )}
 
-      {/* Folder List here */}
-      <FolderList refreshFolders={refreshFolders} />
+      {/* Folder List */}
+      <div className="flex-1 overflow-y-auto">
+        <FolderList folders={folders} />
+      </div>
     </aside>
+  );
+}
+
+// Reusable IconButton Component
+function IconButton({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      className="p-2 hover:bg-gray-200 rounded-full transition-all text-gray-600"
+    >
+      {icon}
+    </button>
   );
 }
