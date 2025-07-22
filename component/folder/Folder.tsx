@@ -16,7 +16,7 @@ export default function FolderSidebar() {
 
   const refreshFolders = async () => {
     const res = await getAllFolders();
-    setFolders(res);
+    setFolders(res.reverse());
   };
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function FolderSidebar() {
   }, []);
 
   return (
-    <aside className="border-r h-full p-4 flex flex-col gap-6 bg-white shadow-sm w-72">
+    <aside className="border-r h-full p-4 gap-3 bg-white shadow-sm">
       {/* Header Icons */}
       <div className="flex justify-center items-center">
         <IconButton
@@ -46,7 +46,7 @@ export default function FolderSidebar() {
 
       {/* Conditional Form */}
       {(showCreate.folder || showCreate.file) && (
-        <div className="animate-fade-in bg-gray-50 p-3 rounded-lg border">
+        <div className="animate-fade-in mt-5">
           <CreateFolder
             onCreated={() => {
               refreshFolders();
@@ -58,7 +58,7 @@ export default function FolderSidebar() {
       )}
 
       {/* Folder List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto mt-5">
         <FolderList folders={folders} />
       </div>
     </aside>
