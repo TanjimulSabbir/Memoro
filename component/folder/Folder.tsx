@@ -58,9 +58,13 @@ export default function FolderSidebar() {
       )}
 
       {/* Folder List */}
-      <div className="flex-1 overflow-y-auto mt-5">
-        <FolderList folders={folders} />
-      </div>
+      <FolderList
+        folders={folders}
+        onCreateFile={(folderId) => {
+          // Trigger modal or file form
+          console.log("Create file under folder", folderId);
+        }}
+      />
     </aside>
   );
 }

@@ -1,8 +1,22 @@
 import { Folder } from "@/db/dbTypes";
-import { FolderIcon } from "lucide-react";
-import React from "react";
+import { FolderIcon, MoreVertical } from "lucide-react";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button"; // assuming shadcn/ui
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
-export default function FolderList({ folders }: { folders: Folder[] }) {
+interface FolderListProps {
+  folders: Folder[];
+  onCreateFile: (folderId: number, fileName: string) => void;
+}
+
+export default function FolderList({ folders, onCreateFile }: FolderListProps) {
+  const [selectedFolderId, setSelectedFolderId] = useState<number | null>(null);
+
   if (!folders || folders.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-10 text-sm">
@@ -12,23 +26,67 @@ export default function FolderList({ folders }: { folders: Folder[] }) {
   }
 
   return (
-    <ul className="space-y-2">
-      {folders.map((folder) => (
-        <li
-          key={folder.id}
-          className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition cursor-pointer group border"
-        >
-          <FolderIcon className="text-blue-500 w-5 h-5 group-hover:scale-110 transition" />
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold text-gray-800 group-hover:underline">
-              {folder.name}
-            </span>
-            <span className="text-xs text-gray-500">
-              Created: {new Date(folder.createdAt).toLocaleDateString()}
-            </span>
-          </div>
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-4 mt-5">
+      <ul className="space-y-2">
+        {folders.map((folder) => {
+          const isSelected = selectedFolderId === folder.id;
+          return (
+            <li
+              key={folder.id}
+              onClick={() => setSelectedFolderId(folder.id)}
+              className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition ${
+                isSelected ? "bg-blue-100 border-blue-300" : "hover:bg-gray-100"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <FolderIcon className="text-blue-500 w-5 h-5" />
+                <div className="flex flex-col">
+                  <span
+                    className={`text-sm font-semibold ${
+                      isSelected ? "text-blue-700" : "text-gray-800"
+                    }`}
+                  >
+                    {folder.name}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(folder.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3-dot menu */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button size="icon" variant="ghost">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-40 p-2 space-y-2">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-sm"
+                    onClick={() => setSelectedFolderId(folder.id)}
+                  >
+                    📄 Create File
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-sm"
+                  >
+                    📝 Rename Folder
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-sm text-red-500"
+                  >
+                    🗑️ Delete Folder
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

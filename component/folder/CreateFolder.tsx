@@ -1,4 +1,6 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { addFolder } from "@/db/folder";
 import { useState } from "react";
 
@@ -20,24 +22,20 @@ export default function CreateFolder({
   }
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        📁
-        <input
-          type="text"
-          placeholder={`New ${type} name`}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border h-9 rounded pl-2 flex-grow placeholder:text-sm"
-        />
-        <button
-          type="submit"
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
-          className="bg-blue-500 text-white px-4 py-2 text-sm rounded"
-        >
-          Create
-        </button>
-      </form>
+    <div className="flex items-center gap-2">
+      <Input
+        placeholder={`${type === "folder" ? "Folder" : "File"} Name`}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full"
+      />
+      <Button
+        onClick={handleSubmit}
+        onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
+        variant="default"
+      >
+        + {type === "folder" ? "Folder" : "File"}
+      </Button>
     </div>
   );
 }
