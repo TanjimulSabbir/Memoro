@@ -1,21 +1,38 @@
 import Dexie, { Table } from "dexie";
-import { FilesItem, Folder, Note } from "./dbTypes";
 
-class MemoroDB extends Dexie {
-  folders!: Table<Folder, number>;
-  files!: Table<FilesItem, number>;
-  notes!: Table<Note, number>;
+// Type Definitions
+export interface Folder {
+  id: string; // UUID or custom ID
+  name: string;
+  parentId?: string | null; // null for root folder
+  createdAt: Date;
+  updatedAt: Date;
+  type: "folder";
+}
+
+export interface File {
+  id: string;
+  name: string;
+  parentId: string; // must belong to a folder
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+  type: "file";
+}
+
+// Dexie Database
+class MemoroFileSystemDB extends Dexie {
+  folders!: Table<Folder>;
+  files!: Table<File>;
 
   constructor() {
-    super("memoro");
-    this.version(2).stores({
-      folders: "++id, parentId, name, createdAt",
-      files: "++id, folderId, name, createdAt",
-      notes: "++id, folderId, title, content, createdAt, updatedAt",
+    super("MemoroFileSystemDB");
+
+    this.version(1).stores({
+      folders: "id, parentId, name, createdAt",
+      files: "id, parentId, name, createdAt",
     });
   }
 }
 
-const db = new MemoroDB();
-
-export default db;
+export const db = new MemoroFileSystemDB();
