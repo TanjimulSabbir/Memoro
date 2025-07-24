@@ -1,6 +1,7 @@
 "use client";
 import { db, FileSystemEntityBase } from "@/db/db";
 import { createFile, createFolder } from "@/db/entityCreate";
+import { ArrowRight, ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function FolderTree({
@@ -9,7 +10,6 @@ export default function FolderTree({
   parentId?: string | null;
 }) {
   const [entities, setEntities] = useState<FileSystemEntityBase[]>([]);
-
 
   const loadEntities = async () => {
     let children;
@@ -32,17 +32,20 @@ export default function FolderTree({
   }, [parentId]);
 
   return (
-    <div className="ml-4 border-l pl-2">
+    <div className="border-l ml-2 pl-4 text-black">
       <ul>
         {entities.map((entity) => (
           <li key={entity.id}>
             {entity.type === "folder" ? (
               <>
-                📁 {entity.name}
+                <p className="flex items-center cursor-pointer">
+                  {" "}
+                  <ChevronLeft className="w-5 h-5 font-thin"/> {entity.name}
+                </p>
                 <FolderTree parentId={entity.id} />
               </>
             ) : (
-              <>📄 {entity.name}</>
+              <li>📄 {entity.name}</li>
             )}
           </li>
         ))}

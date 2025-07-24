@@ -4,10 +4,15 @@ import { Input } from "@/components/ui/input";
 import { createFile, createFolder } from "@/db/entityCreate";
 import { useState } from "react";
 
-export default function CreateFolder(
-  type: "folder" | "file",
-  parentId: string | null
-) {
+type CreateEntityPropsType = {
+  type: "folder" | "file";
+  parentId: string | null;
+};
+
+export default function CreateEntity({
+  type,
+  parentId,
+}: CreateEntityPropsType) {
   const [folderName, setFolderName] = useState("");
   const [fileName, setFileName] = useState("");
   const [content, setContent] = useState("");
