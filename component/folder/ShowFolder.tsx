@@ -1,5 +1,6 @@
 "use client";
-import { db } from "@/db/db";
+import { db, FileSystemEntityBase } from "@/db/db";
+import { IndexableType } from "dexie";
 import React, { useEffect, useState } from "react";
 
 export default function FolderTree({
@@ -7,51 +8,53 @@ export default function FolderTree({
 }: {
   parentId?: string | null;
 }) {
-  const [folders, setFolders] = useState<any[]>([]);
-  const [files, setFiles] = useState<any[]>([]);
+  const [entities, setEntities] = useState<FileSystemEntityBase[]>([]);
   const [folderName, setFolderName] = useState("");
   const [fileName, setFileName] = useState("");
 
+  const loadEntities = async () => {
+    const children = await db.entities
+      .where("parentId")
+      .equals(parentId as IndexableType) // ✅ prevents runtime error for null
+      .toArray();
+    setEntities(children);
+  };
+
   useEffect(() => {
-    const load = async () => {
-      const childFolders = await db.folders
-        .where("parentId")
-        .equals(parentId)
-        .toArray();
-      const childFiles = await db.files
-        .where("parentId")
-        .equals(parentId)
-        .toArray();
-
-      setFolders(childFolders);
-      setFiles(childFiles);
-    };
-
-    load();
+    loadEntities();
   }, [parentId]);
 
   const createFolder = async () => {
-    if (folderName.trim()) {
-      await db.folders.add({ name: folderName, parentId });
-      setFolderName("");
-      const updated = await db.folders
-        .where("parentId")
-        .equals(parentId)
-        .toArray();
-      setFolders(updated);
-    }
+    if (!folderName.trim()) return;
+
+    await db.entities.add({
+      id: crypto.randomUUID(),
+      name: folderName.trim(),
+      parentId,
+      type: "folder",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    setFolderName("");
+    loadEntities();
   };
 
   const createFile = async () => {
-    if (fileName.trim()) {
-      await db.files.add({ name: fileName, parentId });
-      setFileName("");
-      const updated = await db.files
-        .where("parentId")
-        .equals(parentId)
-        .toArray();
-      setFiles(updated);
-    }
+    if (!fileName.trim()) return;
+
+    await db.entities.add({
+      id: crypto.randomUUID(),
+      name: fileName.trim(),
+      parentId,
+      type: "file",
+      content: "", // start with empty content
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    setFileName("");
+    loadEntities();
   };
 
   return (
@@ -70,6 +73,7 @@ export default function FolderTree({
           ➕📁
         </button>
       </div>
+
       <div className="mb-4">
         <input
           className="border rounded p-1 text-sm mr-2"
@@ -86,14 +90,17 @@ export default function FolderTree({
       </div>
 
       <ul>
-        {folders.map((folder) => (
-          <li key={folder.id}>
-            📁 {folder.name}
-            <FolderTree parentId={folder.id} />
+        {entities.map((entity) => (
+          <li key={entity.id}>
+            {entity.type === "folder" ? (
+              <>
+                📁 {entity.name}
+                <FolderTree parentId={entity.id} />
+              </>
+            ) : (
+              <>📄 {entity.name}</>
+            )}
           </li>
-        ))}
-        {files.map((file) => (
-          <li key={file.id}>📄 {file.name}</li>
         ))}
       </ul>
     </div>
