@@ -11,6 +11,10 @@ export interface FileSystemEntityBase {
   updatedAt: Date;
 }
 
+// Optional: create union type for better type safety
+export type FileSystemEntity =
+  | { type: "folder"; content?: never }
+  | { type: "file"; content: string };
 
 // Dexie Database
 class MemoroFileSystemDB extends Dexie {
