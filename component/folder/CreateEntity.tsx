@@ -19,37 +19,55 @@ export default function CreateEntity({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const now = new Date();
+    const id = crypto.randomUUID();
+
     if (type === "folder" && !folderName.trim()) return;
     if (type === "file" && !fileName.trim()) return;
 
-    if (type === "folder")
-      createFolder({
-        id: crypto.randomUUID(),
-        name: folderName.trim(),
-        parentId,
-        type: type,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-    if (type === "file") {
-      await createFile({
-        id: crypto.randomUUID(),
-        name: fileName.trim(),
-        parentId: parentId, // Adjust as needed
-        type: "file",
-        content, // Default content for new life
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+    try {
+      if (type === "folder") {
+        const res = await createFolder({
+          id,
+          name: folderName.trim(),
+          parentId,
+          type: "folder",
+          createdAt: now,
+          updatedAt: now,
+        });
+        console.log("Folder created:", res);
+      }
+
+      if (type === "file") {
+        const res = await createFile({
+          id,
+          name: fileName.trim(),
+          parentId,
+          type: "file",
+          content,
+          createdAt: now,
+          updatedAt: now,
+        });
+        console.log("File created:", res);
+      }
+
+      // Optional reset logic
+      setFolderName("");
+      setFileName("");
+      setContent("This is a new life. You can edit it later.");
+    } catch (error) {
+      console.error("Failed to create entity:", error);
     }
   }
+
   const handleName = (name: string) => {
     if (type === "folder") {
       setFolderName(name);
     }
     if (type === "file") {
       setFileName(name);
-      setContent("This is a new life. You can edit it later."); // Default content for new files
+      setContent("This is a new life. You can edit it later.");
     }
   };
 
@@ -66,6 +84,7 @@ export default function CreateEntity({
         onClick={handleSubmit}
         onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
         variant="default"
+        className="cursor-pointer"
       >
         + {type === "folder" ? "Folder" : "File"}
       </Button>

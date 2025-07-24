@@ -1,55 +1,51 @@
+// components/FolderTree.tsx
 "use client";
-import { db, FileSystemEntityBase } from "@/db/db";
-import { createFile, createFolder } from "@/db/entityCreate";
-import { ArrowRight, ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
+import { db, FileSystemEntityBase } from "@/db/db";
+import Entity from "./Entity";
 
 export default function FolderTree({
-  parentId = null,
+  parentId,
+  selectedFolderParentId,
+  setSelectedFolderParentId,
 }: {
-  parentId?: string | null;
+  parentId: string | null;
+  selectedFolderParentId: string | null;
+  setSelectedFolderParentId: (folderId: string | null) => void;
 }) {
   const [entities, setEntities] = useState<FileSystemEntityBase[]>([]);
 
-  const loadEntities = async () => {
-    let children;
-
-    if (parentId === null) {
-      // When looking for root-level entities
-      children = await db.entities
-        .filter((entity) => entity.parentId === null)
-        .toArray();
-    } else {
-      children = await db.entities.where("parentId").equals(parentId).toArray();
-    }
-    console.log(`Loading entities for parentId: ${parentId}`, children);
-
-    setEntities(children);
-  };
-
   useEffect(() => {
+    const loadEntities = async () => {
+      let children;
+
+      if (parentId === null) {
+        children = await db.entities
+          .filter((entity) => entity.parentId === null)
+          .toArray();
+      } else {
+        children = await db.entities
+          .where("parentId")
+          .equals(parentId)
+          .toArray();
+      }
+
+      setEntities(children);
+    };
+
     loadEntities();
   }, [parentId]);
 
   return (
-    <div className="border-l ml-2 pl-4 text-black">
-      <ul>
-        {entities.map((entity) => (
-          <li key={entity.id}>
-            {entity.type === "folder" ? (
-              <>
-                <p className="flex items-center cursor-pointer">
-                  {" "}
-                  <ChevronLeft className="w-5 h-5 font-thin"/> {entity.name}
-                </p>
-                <FolderTree parentId={entity.id} />
-              </>
-            ) : (
-              <li>📄 {entity.name}</li>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="ml-4 border-l pl-2">
+      {entities.map((entity) => (
+        <Entity
+          key={entity.id}
+          entity={entity}
+          selectedFolderParentId={selectedFolderParentId}
+          setSelectedFolderParentId={setSelectedFolderParentId}
+        />
+      ))}
+    </ul>
   );
 }

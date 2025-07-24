@@ -1,23 +1,45 @@
+// App.tsx or any other parent component
 "use client";
-import React from "react";
-import FolderTree from "./ShowFolder";
-import CreateEntity from "./CreateEntity";
+import React, { useEffect, useState } from "react";
+import ShowFolder from "./ShowFolder";
 import { Button } from "@/components/ui/button";
+import CreateEntity from "./CreateEntity";
 
 export default function App() {
-  const [type, setType] = React.useState<"folder" | "file">("folder");
+  const [selectedFolderParentId, setSelectedFolderParentId] = useState<
+    string | null
+  >(null);
+  const [type, setType] = React.useState<"folder" | "file">(
+    selectedFolderParentId ? "folder" : "file"
+  );
+  // useEffect(() => {
+  //   setType(selectedFolderParentId ? "folder" : "file");
+  // }, [selectedFolderParentId]);
   return (
-    <div className="border-r p-5">
-      <h1 className="text-xl font-bold">Memoro</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">File Explorer</h1>
       <div className="mt-5 mb-10">
         <div className="flex gap-2 mb-4">
-          <Button onClick={() => setType("folder")}>FOLDER</Button>
-          <Button onClick={() => setType("file")}>FILE</Button>
+          <Button
+            className={`${type === "folder" ? "!bg-green-500" : ""}`}
+            onClick={() => setType("folder")}
+          >
+            FOLDER
+          </Button>
+          <Button
+            className={`${type === "file" ? "!bg-green-500" : ""}`}
+            onClick={() => setType("file")}
+          >
+            FILE
+          </Button>
         </div>
-        <CreateEntity type={type} parentId={null} />
+        <CreateEntity type={type} parentId={selectedFolderParentId || null} />
       </div>
-
-      <FolderTree />
+      <ShowFolder
+        parentId={null}
+        selectedFolderParentId={selectedFolderParentId}
+        setSelectedFolderParentId={setSelectedFolderParentId}
+      />
     </div>
   );
 }
