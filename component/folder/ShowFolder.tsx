@@ -1,7 +1,7 @@
 "use client";
 import { db, FileSystemEntityBase } from "@/db/db";
-import { IndexableType } from "dexie";
-import React, { useEffect, useState } from "react";
+import { createFile, createFolder } from "@/db/entityCreate";
+import { useEffect, useState } from "react";
 
 export default function FolderTree({
   parentId = null,
@@ -11,51 +11,27 @@ export default function FolderTree({
   const [entities, setEntities] = useState<FileSystemEntityBase[]>([]);
   const [folderName, setFolderName] = useState("");
   const [fileName, setFileName] = useState("");
+  const [content, setContent] = useState("");
 
   const loadEntities = async () => {
-    const children = await db.entities
-      .where("parentId")
-      .equals(parentId as IndexableType) // ✅ prevents runtime error for null
-      .toArray();
+    let children;
+
+    if (parentId === null) {
+      // When looking for root-level entities
+      children = await db.entities
+        .filter((entity) => entity.parentId === null)
+        .toArray();
+    } else {
+      children = await db.entities.where("parentId").equals(parentId).toArray();
+    }
+    console.log(`Loading entities for parentId: ${parentId}`, children);
+
     setEntities(children);
   };
 
   useEffect(() => {
     loadEntities();
   }, [parentId]);
-
-  const createFolder = async () => {
-    if (!folderName.trim()) return;
-
-    await db.entities.add({
-      id: crypto.randomUUID(),
-      name: folderName.trim(),
-      parentId,
-      type: "folder",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    setFolderName("");
-    loadEntities();
-  };
-
-  const createFile = async () => {
-    if (!fileName.trim()) return;
-
-    await db.entities.add({
-      id: crypto.randomUUID(),
-      name: fileName.trim(),
-      parentId,
-      type: "file",
-      content: "", // start with empty content
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    setFileName("");
-    loadEntities();
-  };
 
   return (
     <div className="ml-4 border-l pl-2">
@@ -68,7 +44,16 @@ export default function FolderTree({
         />
         <button
           className="bg-blue-500 text-white px-2 py-1 text-sm rounded"
-          onClick={createFolder}
+          onClick={() =>
+            createFolder({
+              id: crypto.randomUUID(),
+              name: folderName,
+              parentId,
+              type: "folder",
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            })
+          }
         >
           ➕📁
         </button>
@@ -83,7 +68,17 @@ export default function FolderTree({
         />
         <button
           className="bg-green-500 text-white px-2 py-1 text-sm rounded"
-          onClick={createFile}
+          onClick={() =>
+            createFile({
+              id: crypto.randomUUID(),
+              name: fileName,
+              parentId,
+              type: "file",
+              content,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            })
+          }
         >
           ➕📄
         </button>
