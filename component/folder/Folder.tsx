@@ -17,7 +17,7 @@ export default function App() {
   // }, [selectedFolderParentId]);
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">File Explorer</h1>
+      <h1 className="text-2xl font-bold mb-4">MEMORO</h1>
       <div className="mt-5 mb-10">
         <div className="flex gap-2 mb-4">
           <Button
