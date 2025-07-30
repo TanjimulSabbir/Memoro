@@ -54,7 +54,6 @@ export default function App() {
             <File />
           </Button>
         </div>
-        <CreateEntity type={type} parentId={selectedFolderParentId || null} />
       </div>
       <ShowFolder parentId={null} load={load} setLoad={setLoad} />
     </div>
