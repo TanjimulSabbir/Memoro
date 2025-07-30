@@ -11,6 +11,18 @@ export const createFolder = async (data: FileSystemEntityBase) => {
   });
 };
 
+export const UpdateFolderName = async (
+  folderName: string,
+  entity: FileSystemEntityBase
+) => {
+  if (!folderName.trim()) return;
+
+  await db.entities.update(entity.id, {
+    name: folderName,
+    updatedAt: new Date(),
+  });
+};
+
 export const createFile = async (data: FileSystemEntityBase) => {
   if (!data.name.trim()) return;
 

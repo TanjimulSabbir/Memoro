@@ -1,19 +1,23 @@
 // components/FolderTree.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
 import { db, FileSystemEntityBase } from "@/db/db";
-import Entity from "./Entity";
+import { createFolder, UpdateFolderName } from "@/db/entityCreate";
+import { log } from "console";
+import { ChevronLeft } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default function FolderTree({
+export default function ShowFolder({
   parentId,
-  selectedFolderParentId,
-  setSelectedFolderParentId,
+  load,
+  setLoad,
 }: {
   parentId: string | null;
-  selectedFolderParentId: string | null;
-  setSelectedFolderParentId: (folderId: string | null) => void;
+  load: string;
+  setLoad: (value: string) => void;
 }) {
   const [entities, setEntities] = useState<FileSystemEntityBase[]>([]);
+  const [addName, setAddName] = useState("");
 
   useEffect(() => {
     const loadEntities = async () => {
@@ -29,22 +33,53 @@ export default function FolderTree({
           .equals(parentId)
           .toArray();
       }
+      const findLatestEntity = children.find((item) => item.id === load);
+      console.log(children, findLatestEntity, "children,findLatestEntity");
 
       setEntities(children);
     };
 
     loadEntities();
-  }, [parentId]);
+  }, [parentId, load]);
+
+  const handleUpdateFolder = async (
+    foldername: string,
+    entity: FileSystemEntityBase
+  ) => {
+    const res = await UpdateFolderName(foldername, entity);
+    setLoad("");
+    console.log(res, "updated foldername");
+  };
 
   return (
     <ul className="ml-4 border-l pl-2">
       {entities.map((entity) => (
-        <Entity
-          key={entity.id}
-          entity={entity}
-          selectedFolderParentId={selectedFolderParentId}
-          setSelectedFolderParentId={setSelectedFolderParentId}
-        />
+        <li key={entity.id} className="my-1">
+          {entity.type === "folder" ? (
+            <div>
+              <p className="flex items-center space-x-1">
+                <ChevronLeft />{" "}
+                {entity.id === load ? (
+                  <Input
+                    defaultValue={entity.name}
+                    onBlur={(e) => handleUpdateFolder(e.target.value, entity)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleUpdateFolder(e.currentTarget.value, entity);
+                      }
+                    }}
+                    autoFocus
+                  />
+                ) : (
+                  entity.name
+                )}
+              </p>
+              {/* <Entity entity={entity} load={load} /> */}
+            </div>
+          ) : (
+            <div className="ml-5">📄 {entity.name}</div>
+          )}
+        </li>
       ))}
     </ul>
   );
