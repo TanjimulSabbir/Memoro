@@ -4,21 +4,27 @@
 import { Input } from "@/components/ui/input";
 import { db, FileSystemEntityBase } from "@/db/db";
 import { createFolder, updateFolderName } from "@/db/entityCreate";
-import { ChevronDown, ChevronRight, FileText, FolderIcon, MoreVertical } from "lucide-react";
+import { log } from "console";
+import {
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  FolderIcon,
+  MoreVertical,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function ShowFolder({
-  parentId = null,
   load,
   setLoad,
   level = 0,
 }: {
-  parentId: string | null;
   load: string;
   setLoad: (value: string) => void;
   level?: number;
 }) {
   const [entities, setEntities] = useState<FileSystemEntityBase[]>([]);
+  const [parentId, setParentId] = useState<string | null>(null);
   const [contextMenu, setContextMenu] = useState<{
     x: number;
     y: number;
@@ -41,12 +47,7 @@ export default function ShowFolder({
   };
 
   const fetchEntities = async () => {
-    const children =
-      parentId === null
-        ? await db.entities
-            .filter((entity) => entity.parentId === null)
-            .toArray()
-        : await db.entities.where("parentId").equals(parentId).toArray();
+    const children = await db.entities.toArray();
 
     setEntities(children);
   };
@@ -87,7 +88,9 @@ export default function ShowFolder({
       await db.entities.delete(entity.id);
       fetchEntities();
     } else if (action === "create-folder") {
-      await createFolder({
+      console.log(action);
+
+      const res = await createFolder({
         id,
         name: "Untitled",
         parentId: entity.id,
@@ -95,6 +98,8 @@ export default function ShowFolder({
         createdAt: now,
         updatedAt: now,
       });
+      console.log(res, "create folder");
+
       setLoad(id);
       fetchEntities();
     } else if (action === "create-file") {
@@ -114,13 +119,18 @@ export default function ShowFolder({
     setContextMenu({ ...contextMenu, visible: false });
   };
 
+  console.log(entities, "entities");
+
   return (
     <>
       <ul className="ml-2">
         {entities.map((entity) => (
           <div
-            className="flex items-center gap-2 ml-[8px] group px-1 py-0.5 rounded hover:bg-muted/60 transition"
+            className={`flex items-center gap-2  ${entities.some((item) =>
+              item.id === entity.parentId ? "ml-[12px]" : "ml-[8px]"
+            )} group px-1 py-0.5 rounded hover:bg-muted/60 transition`}
             onContextMenu={(e) => handleContextClick(e, entity)}
+            key={entity.id}
           >
             {/* Folder/File Icon */}
             {entity.type === "folder" ? (

@@ -55,7 +55,7 @@ export default function App() {
           </Button>
         </div>
       </div>
-      <ShowFolder parentId={null} load={load} setLoad={setLoad} />
+      <ShowFolder load={load} setLoad={setLoad} />
     </div>
   );
 }
