@@ -3,11 +3,22 @@ import { db, FileSystemEntityBase } from "./db";
 export const createFolder = async (data: FileSystemEntityBase) => {
   if (!data.name.trim()) return;
 
-  await db.entities.add({
+
+  
+const isFolderExists= data.parentId?  db.entities.where(data.parentId):null
+
+  isFolderExists?await db.entities.where(data.parentId).add(children:{
     ...data,
     type: "folder",
     createdAt: data.createdAt || new Date(),
     updatedAt: data.updatedAt || new Date(),
+
+  }) (): await db.entities.add({
+    ...data,
+    type: "folder",
+    createdAt: data.createdAt || new Date(),
+    updatedAt: data.updatedAt || new Date(),
+
   });
 };
 
