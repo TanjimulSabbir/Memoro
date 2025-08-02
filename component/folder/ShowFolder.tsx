@@ -47,7 +47,10 @@ export default function ShowFolder({
   };
 
   const fetchEntities = async () => {
-    const children = await db.entities.toArray();
+    const children = await db.entities
+      .where("parentId")
+      .equals(load??null)
+      .toArray();
 
     setEntities(children);
   };
