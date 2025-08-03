@@ -49,7 +49,7 @@ export default function ShowFolder({
   const fetchEntities = async () => {
     const children = await db.entities
       .where("parentId")
-      .equals(load??null)
+      .equals(load ?? null)
       .toArray();
 
     setEntities(children);
@@ -121,8 +121,6 @@ export default function ShowFolder({
 
     setContextMenu({ ...contextMenu, visible: false });
   };
-
-  console.log(entities, "entities");
 
   return (
     <>
