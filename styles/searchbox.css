@@ -1,0 +1,52 @@
+/* Textbox 1 */
+.textbox {
+  position: absolute; 
+  top: 66px; 
+  left: 84px; 
+  opacity: 1; 
+}
+.textbox input {
+  width: 151px; 
+  height: 24px; 
+  padding-left: 12px; 
+  padding-right: 34px; 
+  font-family: Inter; 
+  font-size: 14px; 
+  line-height: 22px; 
+  font-weight: 400; 
+  background: #FFFFFFFF; /* white */
+  border-radius: 6px 0px 0px 6px; /* border-tl-m border-bl-m */
+  border-width: 1px; 
+  border-color: #BCC1CAFF; /* neutral-400 */
+  border-style: solid; 
+  outline: none; 
+}
+.textbox svg {
+  position: absolute; 
+  top: 12px; 
+  right: 12px; 
+  width: 16px; 
+  height: 16px; 
+  fill: #171A1FFF; /* neutral-900 */
+}
+/* hover */
+.textbox input:hover {
+  color: #BCC1CAFF; /* neutral-400 */
+  background: #FFFFFFFF; /* white */
+  border-color: #A7ADB7FF; /* neutral-450 */
+}
+/* focused */
+.textbox input:focus{
+  color: #BCC1CAFF; /* neutral-400 */
+  background: #FFFFFFFF; /* white */
+  border-color: #9095A0FF; /* neutral-500 */
+}
+/* disabled */
+.textbox input:disabled {
+  color: #BCC1CAFF; /* neutral-400 */
+  background: #FFFFFFFF; /* white */
+  border-color: #BCC1CAFF; /* neutral-400 */
+}
+.textbox :disabled + .icon, .textbox :disabled + .icon + .icon {
+  fill: #171A1FFF; /* neutral-900 */
+}

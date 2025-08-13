@@ -1,13 +1,13 @@
-import Content from "@/component/Content/content";
-import FolderSidebar from "@/component/folder/Folder";
+import Header from "@/component/Header";
+import SideBar from "@/component/Sidebar/SideBar";
 
 export default function Home() {
   return (
-    <div className="text-lg uppercase text-green-500 grid grid-cols-[20%_80%] h-screen">
-      <FolderSidebar />
-      <div>
-        <Content />
-      </div>
+    <div className="">
+      <Header/>
+      <div className="container max-w-screen-2xl mx-auto">
+        <SideBar />
+  </div>
     </div>
   );
 }
