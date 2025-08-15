@@ -7,7 +7,7 @@ import CreateEntity from "./CreateEntity";
 import { File, Folder } from "lucide-react";
 import { createFolder } from "@/db/entityCreate";
 
-export default function App() {
+export default function FolderPage() {
   const [selectedFolderParentId, setSelectedFolderParentId] = useState<
     string | null
   >(null);
@@ -43,18 +43,7 @@ export default function App() {
     }
   }
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">MEMORO</h1>
-      <div className="mt-5 mb-10">
-        <div className="flex gap-2 mb-4">
-          <Button onClick={() => handleSubmit("folder")}>
-            <Folder />
-          </Button>
-          <Button onClick={() => handleSubmit("file")}>
-            <File />
-          </Button>
-        </div>
-      </div>
+    <div>
       <ShowFolder load={load} setLoad={setLoad} />
     </div>
   );
