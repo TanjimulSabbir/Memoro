@@ -1,20 +1,20 @@
 import { Folder, FolderPlus, Mic, Search } from 'lucide-react'
 import "../../styles/searchbox.css"
 
-export default function TopBox() {
+export default function TopBox({ createEntityType, onCreateEntityTypeChange }: { createEntityType: { createBy: "button" | null; type: "file" | "folder" }; onCreateEntityTypeChange: (createdBy: "button" | null, type: "file" | "folder") => void }) {
     return (
         <div className='mb-10 pt-5 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
-                <FolderPlus className='cursor-pointer'/>
-                <Folder className='cursor-pointer' />
+                <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "folder" ? "text-sky-500" : ""}`} onClick={() => onCreateEntityTypeChange("button", "folder")} />
+                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "file" ? "text-sky-500" : ""}`} onClick={() => onCreateEntityTypeChange("button", "file")} />
             </div>
             <div className='flex items-center'>
-                <input type="text" className='max-w-[150px] rounded-md border border-prime px-2 placeholder:text-xs' placeholder='Search...' />
+                <input type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />
                 <div className='relative bg-prime h-[26px] -ml-2 border border-prime flex items-center justify-center px-2 rounded-e-md'>
-                    <Search className='w-3 h-3 text-white' />
-                    <Mic className='absolute top-1.5 -left-6 w-3 h-3 ' />
+                    <Search className='w-3 h-3 text-white cursor-pointer' />
+                    <Mic className='absolute top-1.5 -left-5 w-3 h-3 cursor-pointer' />
                 </div>
-           </div>
+            </div>
         </div>
     )
 }

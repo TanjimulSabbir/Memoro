@@ -1,32 +1,34 @@
 import Dexie, { Table } from "dexie";
 
-// Base type
-export interface FileSystemEntityBase {
+export interface Folder {
   id: string;
-  name: string;
   parentId: string | null;
-  type: "folder" | "file";
-  content?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  folderName: string;
+  createdAt: number;
+  updatedAt: number;
+  type: "folder";
+}
+export interface File {
+  id: string;
+  parentId: string | null;
+  fileName: string;
+  note: string;
+  createdAt: number;
+  updatedAt: number;
+  type: "file";
 }
 
-// Optional: create union type for better type safety
-export type FileSystemEntity =
-  | { type: "folder"; content?: never }
-  | { type: "file"; content: string };
-
-// Dexie Database
-class MemoroFileSystemDB extends Dexie {
-  entities!: Table<FileSystemEntityBase, string>;
+export class MemoroDatabase extends Dexie {
+  folders!: Table<Folder, number>;
+  files!: Table<File, number>;
 
   constructor() {
-    super("MemoroFileSystemDB");
-
-    this.version(2).stores({
-      entities: "id, parentId, name, type, createdAt, [parentId+name]",
+    super("MemoroDatabase");
+    this.version(1).stores({
+      folders: "id, parentId, folderName, createdAt, updatedAt",
+      files: "id, parentId, fileName, createdAt, updatedAt",
     });
   }
 }
 
-export const db = new MemoroFileSystemDB();
+export const db = new MemoroDatabase();
