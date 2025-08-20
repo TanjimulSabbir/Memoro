@@ -2,7 +2,7 @@ import Dexie, { Table } from "dexie";
 
 export interface Folder {
   id: string;
-  parentId: number | null;
+  parentId: string | null;
   folderName: string;
   createdAt: number;
   updatedAt: number;
@@ -10,7 +10,7 @@ export interface Folder {
 }
 export interface File {
   id: string;
-  parentId: number | null;
+  parentId: string | null;
   fileName: string;
   note: string;
   createdAt: number;

@@ -5,15 +5,17 @@ import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { FileText, FolderIcon } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
+import DynamicInput from "./EntityCreatingInput";
 
 export default function ShowFolder({
   createEntityType,
   handleCreateEntityTypeChange,
 }: {
-  createEntityType: { createBy: "button" | null; type: "file" | "folder" };
+  createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
   handleCreateEntityTypeChange: (
     createdBy: "button" | null,
-    type: "file" | "folder"
+    type: "file" | "folder",
+    parentId?: string | null
   ) => void;
 }) {
   // Live DB data
@@ -29,12 +31,10 @@ export default function ShowFolder({
     []
   );
 
-  // 🔑 useRef for typing buffer
-  const inputRef = useRef("");
   const [note] = useState(""); // still state but not tied to keystrokes
 
   const handleCreateEntity = useCallback(
-    async (name: string, parentId: number | null, type: "file" | "folder") => {
+    async (name: string, parentId: string | null, type: "file" | "folder") => {
       if (!name.trim()) {
         return handleCreateEntityTypeChange(null, type);
       }
@@ -71,35 +71,17 @@ export default function ShowFolder({
     return <p className="text-xs text-gray-500">No files or folders yet</p>;
   }
 
-  console.log(entities,"<<<-Entities->>>");
+  console.log(entities, "<<<-Entities->>>");
 
   return (
     <>
       {createEntityType.createBy === "button" && (
-        <Input
-          defaultValue=""
-          onChange={(e) => {
-            inputRef.current = e.target.value; // ✅ store keystrokes in ref
-          }}
-          onBlur={() =>
-            handleCreateEntity(inputRef.current, null, createEntityType.type)
-          }
-          placeholder={
-            createEntityType.type === "folder"
-              ? "New folder name"
-              : "New file name"
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleCreateEntity(inputRef.current, null, createEntityType.type);
-            }
-            if (e.key === "Escape") {
-              handleCreateEntityTypeChange(null, createEntityType.type);
-            }
-          }}
-          autoFocus
-          className="my-3 text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none"
+        <DynamicInput
+          entityType="folder"
+          onSubmit={(val, type) => handleCreateEntity(val, null, type)}
+          onCancel={(type) => handleCreateEntityTypeChange(null, type)}
         />
+
       )}
 
       <ul>
@@ -109,15 +91,32 @@ export default function ShowFolder({
             key={entity.id}
           >
             {entity.type === "folder" ? (
-              <p className="flex items-center space-x-1 text-xs">
-                <FolderIcon className="w-4 h-4 text-yellow-500" strokeWidth={1.5} />
-                <span>{entity.folderName}</span>
-              </p>
+              <div className="w-full">
+                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange("button", "folder", entity.id)}>
+                  <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
+                  <span>{entity.folderName}</span>
+                </p>
+                {createEntityType.type === "folder" && entity.id === createEntityType.parentId && (
+                  <DynamicInput
+                    entityType="folder"
+                    onSubmit={(val, type) => handleCreateEntity(val, entity.id, type)}
+                    onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+                  />
+                )}</div>
             ) : (
-              <p className="flex items-center space-x-1 text-xs">
-                <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
-                <span>{entity.fileName}</span>
-              </p>
+              <div className="w-full">
+                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange("button", "file", entity.parentId || entity.id)}>
+                  <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
+                  <span>{entity.fileName}</span>
+                </p>
+                {createEntityType.type === "file" && entity.id === createEntityType.parentId && (
+                  <DynamicInput
+                    entityType="file"
+                    onSubmit={(val, type) => handleCreateEntity(val, entity.id, type)}
+                    onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+                  />
+                )}</div>
+
             )}
           </li>
         ))}
