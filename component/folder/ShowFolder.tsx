@@ -11,10 +11,12 @@ import { useState } from "react";
 
 export default function ShowFolder({ createEntityType, handleCreateEntityTypeChange }: { createEntityType: { createBy: "button" | null, type: "file" | "folder" }, handleCreateEntityTypeChange: (createdBy: "button" | null, type: "file" | "folder") => void }) {
 
+  const [entityCreated, setEntityCreated] = useState(false);
+
   const entities = useLiveQuery(
     () => Promise.all([db.folders.toArray(), db.files.toArray()])
       .then(([folders, files]) => [...folders, ...files]),
-    [], // dependencies
+    [entityCreated], // dependencies
     []  // default value
   );
   const [parentId, setParentId] = useState<number | null>(null);
@@ -43,9 +45,11 @@ export default function ShowFolder({ createEntityType, handleCreateEntityTypeCha
     }
     if (type === "folder") {
       await db.folders.add(data.folder)
+      setEntityCreated(true);
       handleCreateEntityTypeChange(null, "folder" )
     } else if (type === "file") {
       await db.files.add(data.file)
+      setEntityCreated(true);
       handleCreateEntityTypeChange(null, "file")
     }
 
