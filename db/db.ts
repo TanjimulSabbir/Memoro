@@ -1,7 +1,7 @@
 import Dexie, { Table } from "dexie";
 
 export interface Folder {
-  id?: number;
+  id: string;
   parentId: number | null;
   folderName: string;
   createdAt: number;
@@ -9,7 +9,7 @@ export interface Folder {
   type: "folder";
 }
 export interface File {
-  id?: number;
+  id: string;
   parentId: number | null;
   fileName: string;
   note: string;
@@ -25,8 +25,8 @@ export class MemoroDatabase extends Dexie {
   constructor() {
     super("MemoroDatabase");
     this.version(1).stores({
-      folders: "++id, parentId, folderName, createdAt, updatedAt",
-      files: "++id, parentId, fileName, createdAt, updatedAt",
+      folders: "id, parentId, folderName, createdAt, updatedAt",
+      files: "id, parentId, fileName, createdAt, updatedAt",
     });
   }
 }
