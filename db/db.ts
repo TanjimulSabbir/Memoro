@@ -6,7 +6,6 @@ export interface Folder {
   folderName: string;
   createdAt: number;
   updatedAt: number;
-  children: (Folder | File)[];
   type: "folder";
 }
 export interface File {
