@@ -6,6 +6,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { FileText, FolderIcon } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
+import EntityFolder from "./Folder";
 
 export default function ShowFolder({
   createEntityType,
@@ -25,7 +26,11 @@ export default function ShowFolder({
         db.folders.toArray(),
         db.files.toArray(),
       ]);
-      return [...folders, ...files];
+
+      // merge and sort newest first
+      return [...folders, ...files].sort(
+        (a, b) => b.createdAt - a.createdAt
+      );
     },
     [],
     []
@@ -92,10 +97,7 @@ export default function ShowFolder({
           >
             {entity.type === "folder" ? (
               <div className="w-full">
-                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange("button", "folder", entity.id)}>
-                  <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
-                  <span>{entity.folderName}</span>
-                </p>
+                <EntityFolder entity={entity} handleCreateEntityTypeChange={handleCreateEntityTypeChange} />
                 {createEntityType.type === "folder" && entity.id === createEntityType.parentId && (
                   <DynamicInput
                     entityType="folder"
@@ -105,7 +107,7 @@ export default function ShowFolder({
                 )}</div>
             ) : (
               <div className="w-full">
-                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange("button", "file", entity.parentId || entity.id)}>
+                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange(null, "file", entity.parentId || entity.id)}>
                   <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
                   <span>{entity.fileName}</span>
                 </p>
