@@ -7,17 +7,17 @@ interface props {
 }
 
 export default function EntityFolder({ entity, handleCreateEntityTypeChange }: props) {
-    const [contextMenu, setContextMenu] = React.useState<{ x: number, y: number, visible: boolean }>({ x: 0, y: 0, visible: false });
+    const [contextMenu, setContextMenu] = React.useState<{ entityId: string|null, x: number, y: number, visible: boolean }>({ entityId:null, x: 0, y: 0, visible: false });
 
     const handleOnMenuContext = (event: React.MouseEvent) => {
         event.preventDefault();
-        setContextMenu({ x: event.clientX, y: event.clientY, visible: true });
+        setContextMenu({ entityId: entity.id, x: event.clientX, y: event.clientY, visible: true });
     }
     const handleCreateEntiyByRightClick = (selectMenuTpye: "folder" | "file") => {
         handleCreateEntityTypeChange(null, selectMenuTpye, entity.id);
-        setContextMenu({ ...contextMenu, visible: false });
+        setContextMenu({ ...contextMenu, entityId:null, visible: false });
     }
-    
+
     return (
         <div>
             <p className="flex items-center space-x-1 text-xs"
@@ -26,7 +26,7 @@ export default function EntityFolder({ entity, handleCreateEntityTypeChange }: p
                 <span>{entity.folderName}</span>
             </p>
 
-            {contextMenu.visible && (
+            {contextMenu.visible && contextMenu.entityId === entity.id && (
                 <div
                     className="absolute z-50"
                     style={{ top: contextMenu.y, left: contextMenu.x }}

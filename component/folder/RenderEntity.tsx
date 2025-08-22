@@ -22,18 +22,18 @@ export default function EntityRenderer({
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleFolder = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent triggering parent clicks
+        e.stopPropagation();
         setIsOpen(!isOpen);
     };
 
     return (
-        <li className="flex flex-col gap-1 group pr-1 py-0.5 rounded hover:bg-muted/60 transition">
+        <li className="flex flex-col gap-1 group pr-1 py-1 mt-2 hover:bg-muted/10 hover:rounded-xl transition">
             {entity.type === "folder" ? (
                 <div className="w-full">
                     {/* Folder header */}
                     <div className="flex items-center justify-between cursor-pointer" onClick={toggleFolder}>
                         <EntityFolder entity={entity} handleCreateEntityTypeChange={handleCreateEntityTypeChange} />
-                        <LucideChevronRight className={`${isOpen && entity.children && entity.children.length > 0 ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />
+                        {entity.children && entity.children.length > 0 && <LucideChevronRight className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
                     </div>
 
                     {/* Dynamic input for adding new entity under this folder */}
@@ -58,7 +58,7 @@ export default function EntityRenderer({
                                     handleCreateEntity={handleCreateEntity}
                                 />
                             ))}
-                        
+
                         </ul>
                     )}
                 </div>

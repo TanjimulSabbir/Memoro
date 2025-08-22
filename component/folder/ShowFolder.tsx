@@ -29,17 +29,13 @@ export default function ShowFolder({
       // Map entities by ID for quick lookup
       const map = new Map<string, any>();
       allEntities.forEach(entity => {
-        if (entity.type === "folder") {
-          map.set(entity.id, { ...entity, children: [] });
-        } else {
-          map.set(entity.id, { ...entity });
-        }
+        map.set(entity.id, { ...entity, children: [] });
       });
 
       const roots: any[] = [];
 
       allEntities.forEach(entity => {
-        if (entity.parentId && entity.type === "folder") {
+        if (entity.parentId) {
           const parent = map.get(entity.parentId);
           if (parent) {
             parent.children.push(map.get(entity.id));
@@ -53,7 +49,7 @@ export default function ShowFolder({
       const sortChildren = (nodes: any[]) => {
         nodes.sort((a, b) => b.createdAt - a.createdAt);
         nodes.forEach(node => {
-          if (node.type === "folder" && node.children.length > 0) sortChildren(node.children);
+          if (node.children.length > 0) sortChildren(node.children);
 
         });
       };
