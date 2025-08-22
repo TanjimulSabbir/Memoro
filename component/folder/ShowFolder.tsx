@@ -1,12 +1,10 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FileText, FolderIcon } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
-import EntityFolder from "./Folder";
+import EntityRenderer from "./RenderEntity";
 
 export default function ShowFolder({
   createEntityType,
@@ -19,7 +17,6 @@ export default function ShowFolder({
     parentId?: string | null
   ) => void;
 }) {
-  // Live DB data
   const entities = useLiveQuery(
     async () => {
       const [folders, files] = await Promise.all([
@@ -27,14 +24,50 @@ export default function ShowFolder({
         db.files.toArray(),
       ]);
 
-      // merge and sort newest first
-      return [...folders, ...files].sort(
-        (a, b) => b.createdAt - a.createdAt
-      );
+      const allEntities = [...folders, ...files];
+
+      // Map entities by ID for quick lookup
+      const map = new Map<string, any>();
+      allEntities.forEach(entity => {
+        if (entity.type === "folder") {
+          map.set(entity.id, { ...entity, children: [] });
+        } else {
+          map.set(entity.id, { ...entity });
+        }
+      });
+
+      const roots: any[] = [];
+
+      allEntities.forEach(entity => {
+        if (entity.parentId && entity.type === "folder") {
+          const parent = map.get(entity.parentId);
+          if (parent) {
+            parent.children.push(map.get(entity.id));
+          }
+        } else {
+          roots.push(map.get(entity.id));
+        }
+      });
+
+      // Recursive sort by createdAt
+      const sortChildren = (nodes: any[]) => {
+        nodes.sort((a, b) => b.createdAt - a.createdAt);
+        nodes.forEach(node => {
+          if (node.type === "folder" && node.children.length > 0) sortChildren(node.children);
+
+        });
+      };
+
+      sortChildren(roots);
+
+      return roots;
     },
     [],
     []
   );
+
+
+
 
   const [note] = useState(""); // still state but not tied to keystrokes
 
@@ -72,10 +105,6 @@ export default function ShowFolder({
     [note, handleCreateEntityTypeChange]
   );
 
-  if (!entities?.length && createEntityType.createBy !== "button") {
-    return <p className="text-xs text-gray-500">No files or folders yet</p>;
-  }
-
   console.log(entities, "<<<-Entities->>>");
 
   return (
@@ -90,39 +119,22 @@ export default function ShowFolder({
       )}
 
       <ul>
-        {entities.map((entity) => (
-          <li
-            className="flex items-center gap-2 group pr-1 py-0.5 rounded hover:bg-muted/60 transition"
-            key={entity.id}
-          >
-            {entity.type === "folder" ? (
-              <div className="w-full">
-                <EntityFolder entity={entity} handleCreateEntityTypeChange={handleCreateEntityTypeChange} />
-                {createEntityType.type === "folder" && entity.id === createEntityType.parentId && (
-                  <DynamicInput
-                    entityType="folder"
-                    onSubmit={(val, type) => handleCreateEntity(val, entity.id, type)}
-                    onCancel={(type) => handleCreateEntityTypeChange(null, type)}
-                  />
-                )}</div>
-            ) : (
-              <div className="w-full">
-                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange(null, "file", entity.parentId || entity.id)}>
-                  <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
-                  <span>{entity.fileName}</span>
-                </p>
-                {createEntityType.type === "file" && entity.id === createEntityType.parentId && (
-                  <DynamicInput
-                    entityType="file"
-                    onSubmit={(val, type) => handleCreateEntity(val, entity.id, type)}
-                    onCancel={(type) => handleCreateEntityTypeChange(null, type)}
-                  />
-                )}</div>
-
-            )}
-          </li>
-        ))}
+        {entities?.length > 0 ? (
+          entities.map((entity: any) => (
+            <EntityRenderer
+              key={entity.id}
+              entity={entity}
+              createEntityType={createEntityType}
+              handleCreateEntityTypeChange={handleCreateEntityTypeChange}
+              handleCreateEntity={handleCreateEntity}
+            />
+          ))
+        ) : (
+          <p className="text-xs text-gray-500">No files or folders yet</p>
+        )}
       </ul>
+
+
     </>
   );
 }
