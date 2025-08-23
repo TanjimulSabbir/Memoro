@@ -1,11 +1,11 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { db } from "@/db/db";
+import { db, File, Folder } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FileText, FolderIcon } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
+import EntityRenderer from "./RenderEntity";
+import ContextMenu from "./ContextMenu";
 
 export default function ShowFolder({
   createEntityType,
@@ -18,20 +18,53 @@ export default function ShowFolder({
     parentId?: string | null
   ) => void;
 }) {
-  // Live DB data
   const entities = useLiveQuery(
     async () => {
       const [folders, files] = await Promise.all([
         db.folders.toArray(),
         db.files.toArray(),
       ]);
-      return [...folders, ...files];
+
+      const allEntities = [...folders, ...files];
+
+      // Map entities by ID for quick lookup
+      const map = new Map<string, any>();
+      allEntities.forEach(entity => {
+        map.set(entity.id, { ...entity, children: [] });
+      });
+
+      const roots: any[] = [];
+
+      allEntities.forEach(entity => {
+        if (entity.parentId) {
+          const parent = map.get(entity.parentId);
+          if (parent) {
+            parent.children.push(map.get(entity.id));
+          }
+        } else {
+          roots.push(map.get(entity.id));
+        }
+      });
+
+      // Recursive sort by createdAt
+      const sortChildren = (nodes: any[]) => {
+        nodes.sort((a, b) => b.createdAt - a.createdAt);
+        nodes.forEach(node => {
+          if (node.children.length > 0) sortChildren(node.children);
+
+        });
+      };
+
+      sortChildren(roots);
+
+      return roots;
     },
     [],
     []
   );
 
   const [note] = useState(""); // still state but not tied to keystrokes
+  const [contextMenu, setContextMenu] = useState<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>({ entity: null, x: 0, y: 0, visible: false });
 
   const handleCreateEntity = useCallback(
     async (name: string, parentId: string | null, type: "file" | "folder") => {
@@ -67,60 +100,64 @@ export default function ShowFolder({
     [note, handleCreateEntityTypeChange]
   );
 
-  if (!entities?.length && createEntityType.createBy !== "button") {
-    return <p className="text-xs text-gray-500">No files or folders yet</p>;
-  }
+  const handleOnMenuContext = (e: React.MouseEvent<HTMLLIElement>, entity: Folder | File) => {
+    e.preventDefault();
+    setContextMenu({ entity, x: e.clientX, y: e.clientY, visible: true });
+  };
+
+  const handleCreateEntityByRightClick = (type: "folder" | "file") => {
+    if (!contextMenu.entity) return;
+    handleCreateEntityTypeChange(null, type, contextMenu.entity.id);
+    setContextMenu({ ...contextMenu, entity: null, visible: false });
+  };
+
+  // Close menu on global click
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu((c) => ({ ...c, visible: false }));
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
 
   console.log(entities, "<<<-Entities->>>");
 
   return (
     <>
       {createEntityType.createBy === "button" && (
-        <DynamicInput
-          entityType="folder"
-          onSubmit={(val, type) => handleCreateEntity(val, null, type)}
-          onCancel={(type) => handleCreateEntityTypeChange(null, type)}
-        />
+        <div className="mb-5">
+          <DynamicInput
+            entityType="folder"
+            placeholder={createEntityType.type === "folder" ? "Create New Folder" : "Create New File"}
+            onSubmit={(val) => handleCreateEntity(val, null, createEntityType.type)}
+            onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+          />
 
+        </div>
       )}
 
       <ul>
-        {entities.map((entity) => (
-          <li
-            className="flex items-center gap-2 group pr-1 py-0.5 rounded hover:bg-muted/60 transition"
-            key={entity.id}
-          >
-            {entity.type === "folder" ? (
-              <div className="w-full">
-                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange("button", "folder", entity.id)}>
-                  <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
-                  <span>{entity.folderName}</span>
-                </p>
-                {createEntityType.type === "folder" && entity.id === createEntityType.parentId && (
-                  <DynamicInput
-                    entityType="folder"
-                    onSubmit={(val, type) => handleCreateEntity(val, entity.id, type)}
-                    onCancel={(type) => handleCreateEntityTypeChange(null, type)}
-                  />
-                )}</div>
-            ) : (
-              <div className="w-full">
-                <p className="flex items-center space-x-1 text-xs" onClick={() => handleCreateEntityTypeChange("button", "file", entity.parentId || entity.id)}>
-                  <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
-                  <span>{entity.fileName}</span>
-                </p>
-                {createEntityType.type === "file" && entity.id === createEntityType.parentId && (
-                  <DynamicInput
-                    entityType="file"
-                    onSubmit={(val, type) => handleCreateEntity(val, entity.id, type)}
-                    onCancel={(type) => handleCreateEntityTypeChange(null, type)}
-                  />
-                )}</div>
-
-            )}
-          </li>
-        ))}
+        {entities?.length > 0 ? (
+          entities.map((entity: any) => (
+            <EntityRenderer
+              key={entity.id}
+              entity={entity}
+              createEntityType={createEntityType}
+              handleCreateEntityTypeChange={handleCreateEntityTypeChange}
+              handleCreateEntity={handleCreateEntity}
+              handleOnMenuContext={handleOnMenuContext}
+            />
+          ))
+        ) : (
+          <p className="text-xs text-gray-500">No files or folders yet</p>
+        )}
       </ul>
+
+      {contextMenu.visible && (
+        <ContextMenu
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          handleCreateEntityByRightClick={handleCreateEntityByRightClick}
+        />
+      )}
     </>
   );
 }

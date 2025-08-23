@@ -1,12 +1,23 @@
 import { Folder, FolderPlus, Mic, Search } from 'lucide-react'
 import "../../styles/searchbox.css"
 
-export default function TopBox({ createEntityType, onCreateEntityTypeChange }: { createEntityType: { createBy: "button" | null; type: "file" | "folder" }; onCreateEntityTypeChange: (createdBy: "button" | null, type: "file" | "folder") => void }) {
+export default function TopBox({
+    createEntityType,
+    handleCreateEntityTypeChange,
+}: {
+    createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
+    handleCreateEntityTypeChange: (
+        createdBy: "button" | null,
+        type: "file" | "folder",
+        parentId?: string | null
+    ) => void;
+}) {
     return (
-        <div className='mb-10 pt-5 flex items-center gap-3'>
+        <div className='mb-7 pt-5 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
-                <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "folder" ? "text-sky-500" : ""}`} onClick={() => onCreateEntityTypeChange("button", "folder")} />
-                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "file" ? "text-sky-500" : ""}`} onClick={() => onCreateEntityTypeChange("button", "file")} />
+                <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "folder" ? "text-sky-500" : ""}`}
+                    onClick={() => handleCreateEntityTypeChange("button", "folder", null)} />
+                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "file" ? "text-sky-500" : ""}`} onClick={() => handleCreateEntityTypeChange("button", "file", null)} />
             </div>
             <div className='flex items-center'>
                 <input type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />
