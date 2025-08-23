@@ -13,6 +13,8 @@ import {
 import React from 'react';
 
 export default function ContextMenu({ contextMenu, handleCreateEntityByRightClick }: { contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean }; setContextMenu: React.Dispatch<React.SetStateAction<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>>; handleCreateEntityByRightClick: (selectMenuTpye: "folder" | "file") => void; }) {
+    console.log(contextMenu, "contextMenu");
+
     return (
         <div
             className="absolute z-50"

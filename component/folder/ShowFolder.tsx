@@ -2,7 +2,7 @@
 
 import { db, File, Folder } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
 import ContextMenu from "./ContextMenu";
@@ -63,11 +63,8 @@ export default function ShowFolder({
     []
   );
 
-
-
-
   const [note] = useState(""); // still state but not tied to keystrokes
-  const [contextMenu, setContextMenu] = useState<{ entity: Folder | File|null; x: number; y: number; visible: boolean }>({ entity: null, x: 0, y: 0, visible: false });
+  const [contextMenu, setContextMenu] = useState<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>({ entity: null, x: 0, y: 0, visible: false });
 
   const handleCreateEntity = useCallback(
     async (name: string, parentId: string | null, type: "file" | "folder") => {
@@ -103,13 +100,6 @@ export default function ShowFolder({
     [note, handleCreateEntityTypeChange]
   );
 
-  // const [contextMenu, setContextMenu] = useState<{
-  //   entityId: string | null;
-  //   x: number;
-  //   y: number;
-  //   visible: boolean;
-  // }>({ entityId: null, x: 0, y: 0, visible: false });
-
   const handleOnMenuContext = (e: React.MouseEvent<HTMLLIElement>, entity: Folder | File) => {
     e.preventDefault();
     setContextMenu({ entity, x: e.clientX, y: e.clientY, visible: true });
@@ -121,7 +111,12 @@ export default function ShowFolder({
     setContextMenu({ ...contextMenu, entity: null, visible: false });
   };
 
-
+  // Close menu on global click
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu((c) => ({ ...c, visible: false }));
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
 
   console.log(entities, "<<<-Entities->>>");
 
@@ -131,11 +126,12 @@ export default function ShowFolder({
         <div className="mb-5">
           <DynamicInput
             entityType="folder"
-            onSubmit={(val, type) => handleCreateEntity(val, null, type)}
+            placeholder={createEntityType.type === "folder" ? "Create New Folder" : "Create New File"}
+            onSubmit={(val) => handleCreateEntity(val, null, createEntityType.type)}
             onCancel={(type) => handleCreateEntityTypeChange(null, type)}
           />
 
-       </div>
+        </div>
       )}
 
       <ul>

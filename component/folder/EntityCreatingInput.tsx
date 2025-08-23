@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Input } from "@/components/ui/input"; // shadcn/ui Input
+import React, { useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
 
 type DynamicInputProps = {
     placeholder?: string;
@@ -17,32 +17,45 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     onCancel,
 }) => {
     const inputRef = useRef<string>(defaultValue);
+    const wrapperRef = useRef<HTMLDivElement>(null);
 
-    return (
-        <Input
-            defaultValue={defaultValue}
-            onChange={(e) => {
-                inputRef.current = e.target.value; // ✅ store keystrokes in ref
-            }}
-            onBlur={() => {
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 if (inputRef.current.trim()) {
+                    // If input has value, submit it
                     onSubmit(inputRef.current, entityType);
-                }
-            }}
-            placeholder={placeholder || (entityType === "folder" ? "New folder name" : "New file name")}
-            onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                    if (inputRef.current.trim()) {
-                        onSubmit(inputRef.current, entityType);
-                    }
-                }
-                if (e.key === "Escape") {
+                } else {
+                    // If input empty, just cancel
                     onCancel?.(entityType);
                 }
-            }}
-            autoFocus
-            className="mt-3 w-full text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none"
-        />
+            }
+        };
+
+        window.addEventListener("mousedown", handleClickOutside);
+        return () => window.removeEventListener("mousedown", handleClickOutside);
+    }, [entityType, onSubmit, onCancel]);
+
+    return (
+        <div ref={wrapperRef}>
+            <Input
+                defaultValue={defaultValue}
+                onChange={(e) => {
+                    inputRef.current = e.target.value;
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" && inputRef.current.trim()) {
+                        onSubmit(inputRef.current, entityType);
+                    }
+                    if (e.key === "Escape") {
+                        onCancel?.(entityType);
+                    }
+                }}
+                autoFocus
+                placeholder={placeholder || (entityType === "folder" ? "New folder name" : "New file name")}
+                className="mt-3 w-full text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none placeholder:text-xs"
+            />
+        </div>
     );
 };
 
