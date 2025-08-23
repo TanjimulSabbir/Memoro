@@ -1,10 +1,11 @@
 "use client";
 
-import { db } from "@/db/db";
+import { db, File, Folder } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
+import ContextMenu from "./ContextMenu";
 
 export default function ShowFolder({
   createEntityType,
@@ -66,6 +67,7 @@ export default function ShowFolder({
 
 
   const [note] = useState(""); // still state but not tied to keystrokes
+  const [contextMenu, setContextMenu] = useState<{ entity: Folder | File|null; x: number; y: number; visible: boolean }>({ entity: null, x: 0, y: 0, visible: false });
 
   const handleCreateEntity = useCallback(
     async (name: string, parentId: string | null, type: "file" | "folder") => {
@@ -101,17 +103,39 @@ export default function ShowFolder({
     [note, handleCreateEntityTypeChange]
   );
 
+  // const [contextMenu, setContextMenu] = useState<{
+  //   entityId: string | null;
+  //   x: number;
+  //   y: number;
+  //   visible: boolean;
+  // }>({ entityId: null, x: 0, y: 0, visible: false });
+
+  const handleOnMenuContext = (e: React.MouseEvent<HTMLLIElement>, entity: Folder | File) => {
+    e.preventDefault();
+    setContextMenu({ entity, x: e.clientX, y: e.clientY, visible: true });
+  };
+
+  const handleCreateEntityByRightClick = (type: "folder" | "file") => {
+    if (!contextMenu.entity) return;
+    handleCreateEntityTypeChange(null, type, contextMenu.entity.id);
+    setContextMenu({ ...contextMenu, entity: null, visible: false });
+  };
+
+
+
   console.log(entities, "<<<-Entities->>>");
 
   return (
     <>
       {createEntityType.createBy === "button" && (
-        <DynamicInput
-          entityType="folder"
-          onSubmit={(val, type) => handleCreateEntity(val, null, type)}
-          onCancel={(type) => handleCreateEntityTypeChange(null, type)}
-        />
+        <div className="mb-5">
+          <DynamicInput
+            entityType="folder"
+            onSubmit={(val, type) => handleCreateEntity(val, null, type)}
+            onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+          />
 
+       </div>
       )}
 
       <ul>
@@ -123,6 +147,7 @@ export default function ShowFolder({
               createEntityType={createEntityType}
               handleCreateEntityTypeChange={handleCreateEntityTypeChange}
               handleCreateEntity={handleCreateEntity}
+              handleOnMenuContext={handleOnMenuContext}
             />
           ))
         ) : (
@@ -130,7 +155,13 @@ export default function ShowFolder({
         )}
       </ul>
 
-
+      {contextMenu.visible && (
+        <ContextMenu
+          contextMenu={contextMenu}
+          setContextMenu={setContextMenu}
+          handleCreateEntityByRightClick={handleCreateEntityByRightClick}
+        />
+      )}
     </>
   );
 }

@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 
 export default function SideBar() {
-    const [createEntityType, setCreateEntityType] = useState<{createBy:"button"|null, type:"file" | "folder", parentId?: string | null}>({createBy:"button", type:"folder"});
+    const [createEntityType, setCreateEntityType] = useState<{createBy:"button"|null, type:"file" | "folder", parentId?: string | null}>({createBy:"button", type:"folder", parentId:null});
 
 
     const handleCreateEntityTypeChange = (createBy: "button" | null, type: "file" | "folder", parentId?: string | null) => {

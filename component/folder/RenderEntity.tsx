@@ -1,15 +1,17 @@
 "use client";
 
-import { FileText, FolderIcon, LucideChevronRight } from "lucide-react";
+import { FileText, LucideChevronLeft } from "lucide-react";
+import React, { MouseEvent, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
 import EntityFolder from "./Folder";
-import { useState } from "react";
+import { File, Folder } from "@/db/db";
 
 interface EntityRendererProps {
     entity: any;
     createEntityType: { createBy: "button" | null; type: "file" | "folder"; parentId?: string | null };
     handleCreateEntityTypeChange: (createdBy: "button" | null, type: "file" | "folder", parentId?: string | null) => void;
     handleCreateEntity: (name: string, parentId: string | null, type: "file" | "folder") => void;
+    handleOnMenuContext: (e: React.MouseEvent<HTMLLIElement>, entity: Folder | File) => void; // ✅ Use React.MouseEvent
 }
 
 export default function EntityRenderer({
@@ -17,23 +19,26 @@ export default function EntityRenderer({
     createEntityType,
     handleCreateEntityTypeChange,
     handleCreateEntity,
+    handleOnMenuContext
 }: EntityRendererProps) {
     // Track folder open/close state
     const [isOpen, setIsOpen] = useState(false);
-
     const toggleFolder = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsOpen(!isOpen);
     };
-
+ 
     return (
-        <li className="flex flex-col gap-1 group pr-1 py-1 mt-2 hover:bg-muted/10 hover:rounded-xl transition">
+        <li className="flex flex-col gap-1 group pr-1 py-1 mt-2 hover:bg-muted/10 hover:rounded-xl transition" onContextMenu={(e) => {
+            e.preventDefault();
+            handleOnMenuContext(e, entity); // correct order ✅
+        }}>
             {entity.type === "folder" ? (
                 <div className="w-full">
                     {/* Folder header */}
                     <div className="flex items-center justify-between cursor-pointer" onClick={toggleFolder}>
                         <EntityFolder entity={entity} handleCreateEntityTypeChange={handleCreateEntityTypeChange} />
-                        {entity.children && entity.children.length > 0 && <LucideChevronRight className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
+                        {entity.children && entity.children.length > 0 && <LucideChevronLeft className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
                     </div>
 
                     {/* Dynamic input for adding new entity under this folder */}
@@ -56,6 +61,7 @@ export default function EntityRenderer({
                                     createEntityType={createEntityType}
                                     handleCreateEntityTypeChange={handleCreateEntityTypeChange}
                                     handleCreateEntity={handleCreateEntity}
+                                    handleOnMenuContext={handleOnMenuContext}
                                 />
                             ))}
 

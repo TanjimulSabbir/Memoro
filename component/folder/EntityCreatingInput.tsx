@@ -41,7 +41,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
                 }
             }}
             autoFocus
-            className="my-3 w-full text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none"
+            className="mt-3 w-full text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none"
         />
     );
 };
