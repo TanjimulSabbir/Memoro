@@ -9,8 +9,8 @@
   --color-prime:var(--prime);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-PtSerif: var(--font-pt-serif);
+  --font-Domine: var(--font-domine);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -115,6 +115,7 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
 @layer components{
   .horizontal-padding{ 
     @apply px-4 sm:px-6 md:px-8 lg:px-12 xl:px-14 2xl:px-16
@@ -125,6 +126,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-PtSerif text-foreground;
   }
 }

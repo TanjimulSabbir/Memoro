@@ -38,7 +38,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     }, [entityType, onSubmit, onCancel]);
 
     return (
-        <div ref={wrapperRef}>
+        <div ref={wrapperRef} className="font-Domine">
             <Input
                 defaultValue={defaultValue}
                 onChange={(e) => setInputText(e.target.value)}

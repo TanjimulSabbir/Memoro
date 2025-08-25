@@ -37,7 +37,7 @@ export default function EntityRenderer({
                         e.preventDefault();
                         handleOnMenuContext(e, entity);
                     }}>
-                        <p className="flex items-center space-x-1 text-xs"
+                        <p className="flex items-center space-x-1 text-xs font-PtSerif"
                         >
                             <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
                             <span>{entity.folderName}</span>
