@@ -39,7 +39,7 @@ export default function SideBar() {
         createBy: "button" | null;
         type: "file" | "folder";
         parentId?: string | null;
-    }>({ createBy: "button", type: "folder", parentId: null });
+    }>({ createBy: null, type: "folder", parentId: null });
 
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);

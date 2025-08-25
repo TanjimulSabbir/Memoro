@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Domine, Geist, Geist_Mono, PT_Serif } from "next/font/google";
+import { Domine, PT_Serif } from "next/font/google";
 import "./globals.css";
 
 const ptSerif = PT_Serif({

@@ -78,7 +78,7 @@ export default function EntityRenderer({
                 }}>
                     {/* File */}
                     <p
-                            className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
+                        className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
                     >
                         <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
                         <span>{entity.fileName}</span>

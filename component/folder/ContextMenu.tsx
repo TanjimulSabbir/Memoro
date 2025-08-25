@@ -1,4 +1,5 @@
-import { File, Folder } from '@/db/db';
+import { db, File, Folder } from '@/db/db';
+import { EntityDelete } from '@/utils/EntityDelete';
 import {
     Download,
     FilePlus,
@@ -14,6 +15,36 @@ import React from 'react';
 
 export default function ContextMenu({ contextMenu, handleCreateEntityByRightClick }: { contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean }; setContextMenu: React.Dispatch<React.SetStateAction<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>>; handleCreateEntityByRightClick: (selectMenuTpye: "folder" | "file") => void; }) {
     console.log(contextMenu, "contextMenu");
+
+    type menuClickType = "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES"
+
+    const handleMenuClick = async (menuType: menuClickType) => {
+        switch (menuType) {
+            case "DELETE":
+                if (contextMenu.entity) {
+                    await EntityDelete(contextMenu.entity);
+                }
+                break;
+            case "RENAME":
+                console.log("Rename");
+                break;
+            case "SHARE":
+                console.log("Share");
+                break;
+            case "OPEN":
+                console.log("Open");
+                break;
+            case "DOWNLOAD":
+                console.log("Download");
+                break;
+            case "SETTINGS":
+                console.log("Settings");
+                break;
+            case "PROPERTIES":
+                console.log("Properties");
+                break;
+        }
+    }
 
     return (
         <div
@@ -72,7 +103,7 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
                 </li>
                 <li
                     className="px-4 py-2 flex items-center gap-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer transition-all duration-150"
-                    onClick={() => console.log("Delete")}
+                    onClick={() => handleMenuClick("DELETE")}
                 >
                     <Trash2 className="w-4 h-4" /> Delete
                 </li>
