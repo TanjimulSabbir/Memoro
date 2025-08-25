@@ -1,73 +1,26 @@
 "use client";
 
 import { db, File, Folder } from "@/db/db";
-import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useEffect, useState } from "react";
+import ContextMenu from "./ContextMenu";
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
-import ContextMenu from "./ContextMenu";
 
 export default function ShowFolder({
   createEntityType,
   handleCreateEntityTypeChange,
-  searchResults
+  data
 }: {
   createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
   handleCreateEntityTypeChange: (
     createdBy: "button" | null,
     type: "file" | "folder",
     parentId?: string | null
-    ) => void;
-    searchResults?: (Folder | File)[];
+  ) => void;
+  data?: (Folder | File)[];
 }) {
-  const entities = useLiveQuery(
-    async () => {
-      const [folders, files] = await Promise.all([
-        db.folders.toArray(),
-        db.files.toArray(),
-      ]);
-
-      const allEntities = [...folders, ...files];
-
-      // Map entities by ID for quick lookup
-      const map = new Map<string, any>();
-      allEntities.forEach(entity => {
-        map.set(entity.id, { ...entity, children: [] });
-      });
-
-      const roots: any[] = [];
-
-      allEntities.forEach(entity => {
-        if (entity.parentId) {
-          const parent = map.get(entity.parentId);
-          if (parent) {
-            parent.children.push(map.get(entity.id));
-          }
-        } else {
-          roots.push(map.get(entity.id));
-        }
-      });
-
-      // Recursive sort by createdAt
-      const sortChildren = (nodes: any[]) => {
-        nodes.sort((a, b) => b.createdAt - a.createdAt);
-        nodes.forEach(node => {
-          if (node.children.length > 0) sortChildren(node.children);
-
-        });
-      };
-
-      sortChildren(roots);
-
-      return roots;
-    },
-    [],
-    []
-  );
-
   const [note] = useState(""); // still state but not tied to keystrokes
   const [contextMenu, setContextMenu] = useState<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>({ entity: null, x: 0, y: 0, visible: false });
-
 
   const handleCreateEntity = useCallback(
     async (name: string, parentId: string | null, type: "file" | "folder") => {
@@ -120,11 +73,6 @@ export default function ShowFolder({
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  console.log(entities,searchResults, "<<<-Entities, SearchResults->>>");
-const [showData,setShowData]=useState<any[]>([])
-  useEffect(() => {
-   setShowData(searchResults?.length ? searchResults : entities);
-  }, [searchResults?.length, entities])
 
   return (
     <>
@@ -141,8 +89,8 @@ const [showData,setShowData]=useState<any[]>([])
       )}
       {/* This is the list of entities */}
       <ul>
-        {showData?.length > 0 ? (
-          showData.map((entity: any) => (
+        {data && data?.length > 0 ? (
+          data.map((entity: any) => (
             <EntityRenderer
               key={entity.id}
               entity={entity}
