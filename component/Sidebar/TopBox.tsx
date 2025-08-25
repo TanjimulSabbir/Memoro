@@ -4,13 +4,15 @@ import "../../styles/searchbox.css"
 export default function TopBox({
     createEntityType,
     handleCreateEntityTypeChange,
+    handleSearchTextChange
 }: {
     createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
     handleCreateEntityTypeChange: (
         createdBy: "button" | null,
         type: "file" | "folder",
         parentId?: string | null
-    ) => void;
+        ) => void;
+        handleSearchTextChange:(value:string)=>void
 }) {
     return (
         <div className='mb-7 pt-5 flex items-center gap-3'>
@@ -20,7 +22,7 @@ export default function TopBox({
                 <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "file" ? "text-sky-500" : ""}`} onClick={() => handleCreateEntityTypeChange("button", "file", null)} />
             </div>
             <div className='flex items-center'>
-                <input type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />
+                <input onChange={(e) => handleSearchTextChange(e.target.value)} type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />
                 <div className='relative bg-prime h-[26px] -ml-2 border border-prime flex items-center justify-center px-2 rounded-e-md'>
                     <Search className='w-3 h-3 text-white cursor-pointer' />
                     <Mic className='absolute top-1.5 -left-5 w-3 h-3 cursor-pointer' />
