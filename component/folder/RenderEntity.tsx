@@ -1,10 +1,9 @@
 "use client";
 
-import { FileText, FolderIcon, LucideChevronLeft } from "lucide-react";
-import React, { MouseEvent, useState } from "react";
-import DynamicInput from "./EntityCreatingInput";
-import EntityFolder from "./Folder";
 import { File, Folder } from "@/db/db";
+import { FileText, FolderIcon, LucideChevronLeft } from "lucide-react";
+import React, { useState } from "react";
+import DynamicInput from "./EntityCreatingInput";
 
 interface EntityRendererProps {
     entity: any;
@@ -37,7 +36,7 @@ export default function EntityRenderer({
                         e.preventDefault();
                         handleOnMenuContext(e, entity);
                     }}>
-                        <p className="flex items-center space-x-1 text-xs font-PtSerif"
+                        <p className="flex items-center space-x-1 text-black dark:text-white text-sm font-PtSerif"
                         >
                             <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
                             <span>{entity.folderName}</span>
@@ -79,7 +78,7 @@ export default function EntityRenderer({
                 }}>
                     {/* File */}
                     <p
-                        className="flex items-center space-x-1 text-xs cursor-pointer"
+                            className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
                     >
                         <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
                         <span>{entity.fileName}</span>

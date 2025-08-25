@@ -10,13 +10,15 @@ import ContextMenu from "./ContextMenu";
 export default function ShowFolder({
   createEntityType,
   handleCreateEntityTypeChange,
+  searchResults
 }: {
   createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
   handleCreateEntityTypeChange: (
     createdBy: "button" | null,
     type: "file" | "folder",
     parentId?: string | null
-  ) => void;
+    ) => void;
+    searchResults?: (Folder | File)[];
 }) {
   const entities = useLiveQuery(
     async () => {
@@ -118,7 +120,11 @@ export default function ShowFolder({
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  console.log(entities, "<<<-Entities->>>");
+  console.log(entities,searchResults, "<<<-Entities, SearchResults->>>");
+const [showData,setShowData]=useState<any[]>([])
+  useEffect(() => {
+   setShowData(searchResults?.length ? searchResults : entities);
+  }, [searchResults?.length, entities])
 
   return (
     <>
@@ -135,8 +141,8 @@ export default function ShowFolder({
       )}
       {/* This is the list of entities */}
       <ul>
-        {entities?.length > 0 ? (
-          entities.map((entity: any) => (
+        {showData?.length > 0 ? (
+          showData.map((entity: any) => (
             <EntityRenderer
               key={entity.id}
               entity={entity}

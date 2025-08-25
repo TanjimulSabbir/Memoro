@@ -54,7 +54,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
                 placeholder={placeholder || (entityType === "folder" ? "New folder name" : "New file name")}
                 className="mt-3 w-full text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none placeholder:text-xs"
             />
-            {inputText.length > 20 && <small className="text-[8px] font-light text-red-500 text-justify ml-1 -mt-2">Name must be between 1 and 20 characters</small>}
+            {inputText.length > 25 && <small className="text-[8px] font-light text-red-500 text-justify ml-1 -mt-2">Name must be between 1 and 20 characters</small>}
         </div>
     );
 };
