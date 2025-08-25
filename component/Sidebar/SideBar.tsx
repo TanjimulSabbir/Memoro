@@ -10,8 +10,6 @@ export default function SideBar() {
 
 
     const handleCreateEntityTypeChange = (createBy: "button" | null, type: "file" | "folder", parentId?: string | null) => {
-        console.log(createBy, type, parentId);
-        
         return setCreateEntityType({ createBy, type, parentId });
     };
 
