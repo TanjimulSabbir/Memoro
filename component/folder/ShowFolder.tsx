@@ -5,15 +5,16 @@ import { useCallback, useEffect, useState } from "react";
 import ContextMenu from "./ContextMenu";
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
+import { createdBy } from "../Sidebar/TopBox";
 
 export default function ShowFolder({
   createEntityType,
   handleCreateEntityTypeChange,
   data
 }: {
-  createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
+  createEntityType: { createBy: createdBy, type: "file" | "folder", parentId?: string | null };
   handleCreateEntityTypeChange: (
-    createdBy: "button" | null,
+    createdBy: createdBy,
     type: "file" | "folder",
     parentId?: string | null
   ) => void;
@@ -23,9 +24,23 @@ export default function ShowFolder({
   const [contextMenu, setContextMenu] = useState<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>({ entity: null, x: 0, y: 0, visible: false });
 
   const handleCreateEntity = useCallback(
-    async (name: string, parentId: string | null, type: "file" | "folder") => {
+    async (name: string, parentId: string | null, type: "file" | "folder", createdBy?:createdBy) => {
       if (!name.trim() || name.length > 20) {
         return;
+      }
+      console.log({createEntityType, name, parentId,type,});
+
+      if (createdBy === "RENAME"&&parentId) {
+        console.log(createEntityType, "Renaming entity");
+        
+        if (createEntityType.parentId === null) return;
+        if (type === "folder") {
+          await db.folders.update(parentId, { folderName: name });
+        }
+        if (type === "file") {
+          await db.files.update(parentId, { fileName: name });
+        }
+        return handleCreateEntityTypeChange(null, type);
       }
 
       const now = Date.now();
@@ -77,7 +92,7 @@ export default function ShowFolder({
   return (
     <>
       {/* this is the create entity input while no parentId(first layer entity) */}
-      {createEntityType.createBy === "button" && (
+      {createEntityType.createBy === "BUTTON" && (
         <div className="mb-5">
           <DynamicInput
             entityType="folder"
@@ -110,6 +125,7 @@ export default function ShowFolder({
           contextMenu={contextMenu}
           setContextMenu={setContextMenu}
           handleCreateEntityByRightClick={handleCreateEntityByRightClick}
+          handleCreateEntityTypeChange={handleCreateEntityTypeChange}
         />
       )}
     </>

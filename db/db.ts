@@ -19,8 +19,8 @@ export interface File {
 }
 
 export class MemoroDatabase extends Dexie {
-  folders!: Table<Folder, number>;
-  files!: Table<File, number>;
+  folders!: Table<Folder, string>;
+  files!: Table<File, string>;
 
   constructor() {
     super("MemoroDatabase");

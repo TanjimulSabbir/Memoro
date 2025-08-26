@@ -1,24 +1,17 @@
 "use client";
 
-import { toast } from "sonner";
-import { db, File, Folder } from "@/db/db";
 import { Button } from "@/components/ui/button";
+import { db, File, Folder } from "@/db/db";
 import { AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 
 export function EntityDelete(entity: File | Folder, onClose?: () => void) {
     if (!entity) return;
 
     const entityName = "fileName" in entity ? entity.fileName : entity.folderName;
 
-    // Convert ID to number
-    const id = Number(entity.id);
-    if (isNaN(id)) {
-        console.error("Invalid entity id:", entity.id);
-        return toast.error("Cannot delete: invalid ID");
-    }
-
     toast(
-        <div className="flex flex-col gap-4 p-4 min-w-[280px] bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-lg shadow">
+        <div className="flex flex-col gap-4 min-w-[280px]">
             <div className="flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-gray-800 dark:text-gray-200" />
                 <span className="font-semibold text-gray-900 dark:text-gray-100">
@@ -48,14 +41,16 @@ export function EntityDelete(entity: File | Folder, onClose?: () => void) {
                     onClick={async () => {
                         try {
                             if ("fileName" in entity) {
-                                await db.files.delete(id);
-                            } else if ("folderName" in entity) {
-                                await db.folders.delete(id);
-                            }
 
-                            toast.message("Deleted successfully", {
-                                description: `"${entityName}" has been deleted.`,
-                            });
+                                await db.files.delete(entity.id);
+                            } else if ("folderName" in entity) {
+                                await db.folders.delete(entity.id);
+                            }
+                            toast.success("Deleted successfully!", {
+                                position: "bottom-right",
+                                duration: 3000,
+                            })
+
                         } catch (err) {
                             console.error("Delete failed:", err);
                             toast.error("Failed to delete");

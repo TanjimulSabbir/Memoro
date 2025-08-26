@@ -12,20 +12,33 @@ import {
     Trash2
 } from "lucide-react";
 import React from 'react';
+import { createdBy } from '../Sidebar/TopBox';
 
-export default function ContextMenu({ contextMenu, handleCreateEntityByRightClick }: { contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean }; setContextMenu: React.Dispatch<React.SetStateAction<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>>; handleCreateEntityByRightClick: (selectMenuTpye: "folder" | "file") => void; }) {
-    console.log(contextMenu, "contextMenu");
-
+export default function ContextMenu({ contextMenu, handleCreateEntityByRightClick, handleCreateEntityTypeChange }:
+    {
+        contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean };
+        setContextMenu: React.Dispatch<React.SetStateAction<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>>;
+        handleCreateEntityByRightClick: (selectMenuTpye: "folder" | "file") => void;
+        handleCreateEntityTypeChange: (
+            createdBy: createdBy,
+            type: "file" | "folder",
+            parentId?: string | null
+        ) => void;
+    }) {
     type menuClickType = "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES"
 
-    const handleMenuClick = async (menuType: menuClickType) => {
+    const handleMenuClick = (menuType: menuClickType) => {
         switch (menuType) {
             case "DELETE":
                 if (contextMenu.entity) {
-                    await EntityDelete(contextMenu.entity);
+                    EntityDelete(contextMenu.entity);
                 }
                 break;
             case "RENAME":
+                if (contextMenu.entity?.type) {
+                    console.log("Renaming", contextMenu.entity.type);
+                    handleCreateEntityTypeChange("RENAME", contextMenu.entity.type, contextMenu.entity.id);
+                }
                 console.log("Rename");
                 break;
             case "SHARE":
@@ -97,7 +110,7 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
                 {/* Edit */}
                 <li
                     className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800 cursor-pointer transition-all duration-150"
-                    onClick={() => console.log("Rename")}
+                    onClick={() => handleMenuClick("RENAME")}
                 >
                     <Pencil className="w-4 h-4" /> Rename
                 </li>

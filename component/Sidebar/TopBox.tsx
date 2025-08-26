@@ -1,25 +1,26 @@
 import { Folder, FolderPlus, Mic, Search } from 'lucide-react'
 import "../../styles/searchbox.css"
-
+export type createdBy="BUTTON"|"RIGHTCLICK"|"RENAME"|null
 export default function TopBox({
     createEntityType,
     handleCreateEntityTypeChange,
     handleSearchTextChange
 }: {
-    createEntityType: { createBy: "button" | null; type: "file" | "folder", parentId?: string | null };
+    createEntityType: { createBy: createdBy; type: "file" | "folder", parentId?: string | null };
     handleCreateEntityTypeChange: (
-        createdBy: "button" | null,
+        createdBy: createdBy,
         type: "file" | "folder",
         parentId?: string | null
         ) => void;
         handleSearchTextChange:(value:string)=>void
 }) {
+    
     return (
         <div className='mb-7 pt-5 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
-                <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "folder" ? "text-sky-500" : ""}`}
-                    onClick={() => handleCreateEntityTypeChange("button", "folder", null)} />
-                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "button" && createEntityType.type === "file" ? "text-sky-500" : ""}`} onClick={() => handleCreateEntityTypeChange("button", "file", null)} />
+                <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "folder" ? "text-sky-500" : ""}`}
+                    onClick={() => handleCreateEntityTypeChange("BUTTON", "folder", null)} />
+                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "file" ? "text-sky-500" : ""}`} onClick={() => handleCreateEntityTypeChange("button", "file", null)} />
             </div>
             <div className='flex items-center'>
                 <input onChange={(e) => handleSearchTextChange(e.target.value)} type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />

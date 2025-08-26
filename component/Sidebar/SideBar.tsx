@@ -1,9 +1,10 @@
 "use client";
-import TopBox from "./TopBox";
-import ShowFolder from "../folder/ShowFolder";
-import { useState, useCallback, useEffect } from "react";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { log } from "node:console";
+import { useCallback, useEffect, useState } from "react";
+import ShowFolder from "../folder/ShowFolder";
+import TopBox, { createdBy } from "./TopBox";
 
 export default function SideBar() {
     // ✅ live query all entities as a nested tree
@@ -36,7 +37,7 @@ export default function SideBar() {
     }, [], []);
 
     const [createEntityType, setCreateEntityType] = useState<{
-        createBy: "button" | null;
+        createBy: createdBy;
         type: "file" | "folder";
         parentId?: string | null;
     }>({ createBy: null, type: "folder", parentId: null });
@@ -46,7 +47,7 @@ export default function SideBar() {
 
     // ✅ update create entity type
     const handleCreateEntityTypeChange = useCallback(
-        (createBy: "button" | null, type: "file" | "folder", parentId?: string | null) => {
+        (createBy: createdBy, type: "file" | "folder", parentId?: string | null) => {
             setCreateEntityType({ createBy, type, parentId });
         },
         []
@@ -114,6 +115,8 @@ export default function SideBar() {
         setResults(filtered);
     }, [searchText, entities]);
 
+    console.log({ createEntityType }, "from createEntityType");
+    
 
     return (
         <div className="relative w-full max-w-[280px] border-r border-gray-300 px-3 min-h-screen">
