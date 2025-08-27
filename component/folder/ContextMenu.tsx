@@ -28,15 +28,25 @@ export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange 
 
     const handleMenuClick = (menuType: RightMenuClickType) => {
         switch (menuType) {
+            case "FOLDER":
+                if (contextMenu.entity) {
+                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
+                }
+                break;
+            case "FILE":
+                if (contextMenu.entity) {
+                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
+                }
+                break;
             case "DELETE":
                 if (contextMenu.entity) {
-                    EntityDelete(contextMenu.entity);
+                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
                 }
                 break;
             case "RENAME":
                 if (contextMenu.entity?.type) {
                     console.log("Renaming", contextMenu.entity.type);
-                    handleCreateEntityTypeChange({ createBy: "RENAME", type: contextMenu.entity.type, parentId: contextMenu.entity.id });
+                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
                 }
                 console.log("Rename");
                 break;

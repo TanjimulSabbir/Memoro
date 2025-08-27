@@ -8,7 +8,6 @@ import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
 
 // export type ChildEntity = (Folder | File) & { children: ChildEntity[] };
-
 export type ContextMenuType = {
   entity: any
   x: number;
@@ -20,6 +19,7 @@ export type handleCreateEntityType = {
   parentId: string | null;
   type: "FOLDER" | "FILE";
   createdBy: createdBy
+  rightClickType: RightMenuClickType|null
 }
 export default function ShowFolder({
   createEntityType,
@@ -31,28 +31,27 @@ export default function ShowFolder({
   data?: (Folder | File)[];
 }) {
   const [note] = useState(""); // still state but not tied to keystrokes
-  const [contextMenu, setContextMenu] = useState<ContextMenuType>({ entity: null, contextType: null, x: 0, y: 0, visible: false });
+  const [contextMenu, setContextMenu] = useState<ContextMenuType>({ entity: null, x: 0, y: 0, visible: false });
 
   const handleCreateEntity = useCallback(
     async (handleCreateEntityType: handleCreateEntityType) => {
-
-      const { name, parentId, type, createdBy } = handleCreateEntityType;
+      const { name, parentId, type, createdBy, rightClickType } = handleCreateEntityType;
 
       if (!name.trim() || name.length > 20) {
         return;
       }
       console.log({ createEntityType, name, parentId, type, });
 
-      if (createdBy === "RENAME" && parentId) {
+      if (rightClickType === "RENAME" && parentId) {
 
         if (createEntityType.parentId === null) return;
-        if (type === "FOLDER") {
+        if (type.toUpperCase() === "FOLDER") {
           await db.folders.update(parentId, { folderName: name });
         }
-        if (type === "FILE") {
+        if (type.toUpperCase() === "FILE") {
           await db.files.update(parentId, { fileName: name });
         }
-        return handleCreateEntityTypeChange({ createBy: null, type, parentId: null });
+        return handleCreateEntityTypeChange({ createBy: null, rightClickType: null, type, parentId: null });
       }
 
       const now = Date.now();
@@ -63,7 +62,7 @@ export default function ShowFolder({
           folderName: name,
           createdAt: now,
           updatedAt: now,
-          type: "folder" as const,
+          type: "FOLDER" as const,
         });
       } else {
         await db.files.add({
@@ -73,11 +72,11 @@ export default function ShowFolder({
           note: note,
           createdAt: now,
           updatedAt: now,
-          type: "file" as const,
+          type: "FILE" as const,
         });
       }
 
-      handleCreateEntityTypeChange({ createBy: null, type, parentId: null });
+      handleCreateEntityTypeChange({ createBy: null, rightClickType: null, type, parentId: null });
     },
     [note, handleCreateEntityTypeChange]
   );
@@ -105,8 +104,8 @@ export default function ShowFolder({
           <DynamicInput
             entityType={createEntityType.type}
             placeholder={createEntityType.type === "FOLDER" ? "Create New Folder" : "Create New File"}
-            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, createdBy: createEntityType.createBy })}
-            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null })}
+            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, createdBy: createEntityType.createBy, rightClickType:null })}
+            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType:null })}
           />
         </div>
       )}

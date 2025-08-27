@@ -4,12 +4,14 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useEffect, useState } from "react";
 import ShowFolder from "../folder/ShowFolder";
 import TopBox from "./TopBox";
+import { RightMenuClickType } from "../folder/ContextMenu";
 
-export type createdBy = "BUTTON" | "RIGHTCLICK" | "RENAME" | null
+export type createdBy = "BUTTON" | "RIGHTCLICK" | null
 export type CreateEntityType = {
     createBy: createdBy;
     type: "FILE" | "FOLDER";
     parentId: string | null;
+    rightClickType: RightMenuClickType | null
 }
 
 
