@@ -1,10 +1,17 @@
 "use client";
 import { db } from "@/db/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { log } from "node:console";
 import { useCallback, useEffect, useState } from "react";
 import ShowFolder from "../folder/ShowFolder";
-import TopBox, { createdBy } from "./TopBox";
+import TopBox from "./TopBox";
+
+export type createdBy = "BUTTON" | "RIGHTCLICK" | "RENAME" | null
+export type CreateEntityType = {
+    createBy: createdBy;
+    type: "FILE" | "FOLDER";
+    parentId: string | null;
+}
+
 
 export default function SideBar() {
     // ✅ live query all entities as a nested tree
@@ -36,22 +43,13 @@ export default function SideBar() {
         return roots;
     }, [], []);
 
-    const [createEntityType, setCreateEntityType] = useState<{
-        createBy: createdBy;
-        type: "file" | "folder";
-        parentId?: string | null;
-    }>({ createBy: null, type: "folder", parentId: null });
+    const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "folder", parentId: null });
 
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);
 
     // ✅ update create entity type
-    const handleCreateEntityTypeChange = useCallback(
-        (createBy: createdBy, type: "file" | "folder", parentId?: string | null) => {
-            setCreateEntityType({ createBy, type, parentId });
-        },
-        []
-    );
+    const handleCreateEntityTypeChange = useCallback((createEntityType: CreateEntityType) => { setCreateEntityType({ ...createEntityType }) }, []);
 
     // ✅ debounce
     const debounce = (fn: (...args: any[]) => void, delay: number) => {
@@ -116,7 +114,7 @@ export default function SideBar() {
     }, [searchText, entities]);
 
     console.log({ createEntityType }, "from createEntityType");
-    
+
 
     return (
         <div className="relative w-full max-w-[280px] border-r border-gray-300 px-3 min-h-screen">

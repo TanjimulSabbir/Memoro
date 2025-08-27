@@ -4,9 +4,9 @@ import { Input } from "@/components/ui/input";
 type DynamicInputProps = {
     placeholder?: string;
     defaultValue?: string;
-    entityType: "folder" | "file";
-    onSubmit: (value: string, type: "folder" | "file") => void;
-    onCancel?: (type: "folder" | "file") => void;
+    entityType: "FOLDER" | "FILE";
+    onSubmit: (value: string, type: "FOLDER" | "FILE") => void;
+    onCancel?: (type: "FOLDER" | "FILE") => void;
 };
 
 const DynamicInput: React.FC<DynamicInputProps> = ({
@@ -47,11 +47,11 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
                         onSubmit(inputText, entityType,);
                     }
                     if (e.key === "Escape") {
-                        onCancel?.(entityType);
+                        // onCancel?.(entityType);
                     }
                 }}
                 autoFocus
-                placeholder={placeholder || (entityType === "folder" ? "New folder name" : "New file name")}
+                placeholder={placeholder || (entityType === "FOLDER" ? "New folder name" : "New file name")}
                 className="mt-3 w-full text-xs px-2 py-1 h-auto bg-transparent focus:ring-0 border-none placeholder:text-xs"
             />
             {inputText.length > 25 && <small className="text-[8px] font-light text-red-500 text-justify ml-1 -mt-2">Name must be between 1 and 20 characters</small>}
