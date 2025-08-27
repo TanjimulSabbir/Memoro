@@ -1,12 +1,10 @@
 "use client";
 
-import { File, Folder } from "@/db/db";
 import { FileText, FolderIcon, LucideChevronLeft } from "lucide-react";
 import React, { useState } from "react";
-import DynamicInput from "./EntityCreatingInput";
 import { CreateEntityType } from "../Sidebar/SideBar";
+import DynamicInput from "./EntityCreatingInput";
 import { handleCreateEntityType } from "./ShowFolder";
-import ContextMenu, { RightMenuClickType } from "./ContextMenu";
 
 interface EntityRendererProps {
     entity: any;
@@ -35,7 +33,7 @@ export default function EntityRenderer({
             {entity.type === "FOLDER" ? (
                 <div className="w-full">
                     {/* here all the folder is rendering and onClick open and closing the folder. OnContext */}
-                    {!(createEntityType.createBy === "RIGHTCLICK" && createEntityType.parentId === entity.id) ?
+                    {!(createEntityType.rightClickType === "RENAME" && createEntityType.parentId === entity.id) ?
 
                         <div className="flex items-center justify-between cursor-pointer"
                             onClick={toggleFolder}
@@ -58,7 +56,7 @@ export default function EntityRenderer({
                         />}
 
                     {/* Creating Entity matched with entity id*/}
-                    {entity.parentId === createEntityType.parentId && (
+                    {createEntityType.rightClickType === "CREATE" && entity.id === createEntityType.parentId && (
                         <DynamicInput
                             placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
                             entityType={createEntityType.type}
@@ -90,7 +88,7 @@ export default function EntityRenderer({
                     handleOnMenuContext(e, entity); // correct order ✅
                 }}>
                     {/* File */}
-                    {createEntityType.createBy !== "RIGHTCLICK" ? <p
+                    {!(createEntityType.rightClickType === "RENAME" && createEntityType.parentId == entity.id) ? <p
                         className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
                     >
                         <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />

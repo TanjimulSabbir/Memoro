@@ -15,7 +15,7 @@ import React from 'react';
 import { CreateEntityType } from '../Sidebar/SideBar';
 import { ContextMenuType } from './ShowFolder';
 
-export type RightMenuClickType = "FOLDER" | "FILE" | "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES";
+export type RightMenuClickType = "CREATE" | "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES";
 
 export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange }:
     {
@@ -28,16 +28,12 @@ export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange 
 
     const handleMenuClick = (menuType: RightMenuClickType) => {
         switch (menuType) {
-            case "FOLDER":
+            case "CREATE":
                 if (contextMenu.entity) {
                     handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
                 }
                 break;
-            case "FILE":
-                if (contextMenu.entity) {
-                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
-                }
-                break;
+
             case "DELETE":
                 if (contextMenu.entity) {
                     handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
@@ -80,13 +76,13 @@ export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange 
                     <>
                         <li
                             className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white cursor-pointer transition-all duration-200"
-                            onClick={() => handleMenuClick("FOLDER")}
+                            onClick={() => handleMenuClick("CREATE")}
                         >
                             <FolderPlus className="w-4 h-4" /> New Folder
                         </li>
                         <li
                             className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white cursor-pointer transition-all duration-200"
-                            onClick={() => handleMenuClick("FILE")}
+                            onClick={() => handleMenuClick("CREATE")}
                         >
                             <FilePlus className="w-4 h-4" /> New File
                         </li>

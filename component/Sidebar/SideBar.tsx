@@ -45,13 +45,13 @@ export default function SideBar() {
         return roots;
     }, [], []);
 
-    const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "FOLDER", parentId: null });
+    const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "FOLDER", parentId: null, rightClickType: null });
 
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);
 
     // ✅ update create entity type
-    const handleCreateEntityTypeChange = useCallback((createEntityType: CreateEntityType) => { setCreateEntityType({ ...createEntityType }) }, []);
+    const handleCreateEntityTypeChange = (createEntityType: CreateEntityType) => (setCreateEntityType({ ...createEntityType }));
 
     // ✅ debounce
     const debounce = (fn: (...args: any[]) => void, delay: number) => {

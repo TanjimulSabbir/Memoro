@@ -1,6 +1,7 @@
 "use client";
 
 import { db, File, Folder } from "@/db/db";
+import { log } from "console";
 import { useCallback, useEffect, useState } from "react";
 import { createdBy, CreateEntityType } from "../Sidebar/SideBar";
 import ContextMenu, { RightMenuClickType } from "./ContextMenu";
@@ -19,7 +20,7 @@ export type handleCreateEntityType = {
   parentId: string | null;
   type: "FOLDER" | "FILE";
   createdBy: createdBy
-  rightClickType: RightMenuClickType|null
+  rightClickType: RightMenuClickType | null
 }
 export default function ShowFolder({
   createEntityType,
@@ -35,21 +36,22 @@ export default function ShowFolder({
 
   const handleCreateEntity = useCallback(
     async (handleCreateEntityType: handleCreateEntityType) => {
-      const { name, parentId, type, createdBy, rightClickType } = handleCreateEntityType;
+      const { name, parentId, type, } = handleCreateEntityType;
+      console.log({ handleCreateEntityType, createEntityType, contextMenu: contextMenu.entity });
 
       if (!name.trim() || name.length > 20) {
         return;
       }
       console.log({ createEntityType, name, parentId, type, });
 
-      if (rightClickType === "RENAME" && parentId) {
+      if (createEntityType.rightClickType === "RENAME" && createEntityType.parentId) {
 
         if (createEntityType.parentId === null) return;
-        if (type.toUpperCase() === "FOLDER") {
-          await db.folders.update(parentId, { folderName: name });
+        if (createEntityType.type === "FOLDER") {
+          await db.folders.update(createEntityType.parentId, { folderName: name });
         }
-        if (type.toUpperCase() === "FILE") {
-          await db.files.update(parentId, { fileName: name });
+        if (createEntityType.type === "FILE") {
+          await db.files.update(createEntityType.parentId, { fileName: name });
         }
         return handleCreateEntityTypeChange({ createBy: null, rightClickType: null, type, parentId: null });
       }
@@ -104,8 +106,8 @@ export default function ShowFolder({
           <DynamicInput
             entityType={createEntityType.type}
             placeholder={createEntityType.type === "FOLDER" ? "Create New Folder" : "Create New File"}
-            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, createdBy: createEntityType.createBy, rightClickType:null })}
-            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType:null })}
+            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, createdBy: createEntityType.createBy, rightClickType: null })}
+            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
           />
         </div>
       )}
