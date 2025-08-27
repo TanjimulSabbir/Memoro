@@ -43,7 +43,7 @@ export default function SideBar() {
         return roots;
     }, [], []);
 
-    const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "folder", parentId: null });
+    const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "FOLDER", parentId: null });
 
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);

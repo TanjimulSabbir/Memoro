@@ -12,22 +12,21 @@ import {
     Trash2
 } from "lucide-react";
 import React from 'react';
-import { createdBy } from '../Sidebar/TopBox';
+import { CreateEntityType } from '../Sidebar/SideBar';
+import { ContextMenuType } from './ShowFolder';
 
-export default function ContextMenu({ contextMenu, handleCreateEntityByRightClick, handleCreateEntityTypeChange }:
+export type RightMenuClickType = "FOLDER" | "FILE" | "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES";
+
+export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange }:
     {
         contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean };
-        setContextMenu: React.Dispatch<React.SetStateAction<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>>;
-        handleCreateEntityByRightClick: (selectMenuTpye: "folder" | "file") => void;
-        handleCreateEntityTypeChange: (
-            createdBy: createdBy,
-            type: "file" | "folder",
-            parentId?: string | null
-        ) => void;
+        setContextMenu: React.Dispatch<React.SetStateAction<ContextMenuType>>;
+        handleCreateEntityTypeChange: (createEntityType: CreateEntityType) => void;
     }) {
-    type menuClickType = "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES"
 
-    const handleMenuClick = (menuType: menuClickType) => {
+    if (!contextMenu.entity) return;
+
+    const handleMenuClick = (menuType: RightMenuClickType) => {
         switch (menuType) {
             case "DELETE":
                 if (contextMenu.entity) {
@@ -37,7 +36,7 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
             case "RENAME":
                 if (contextMenu.entity?.type) {
                     console.log("Renaming", contextMenu.entity.type);
-                    handleCreateEntityTypeChange("RENAME", contextMenu.entity.type, contextMenu.entity.id);
+                    handleCreateEntityTypeChange({ createBy: "RENAME", type: contextMenu.entity.type, parentId: contextMenu.entity.id });
                 }
                 console.log("Rename");
                 break;
@@ -67,17 +66,17 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
             <ul className="w-60 bg-white dark:bg-neutral-900 dark:text-neutral-200 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-2 animate-fadeIn z">
 
                 {/* Create New */}
-                {contextMenu.entity?.type === "folder" && (
+                {contextMenu?.entity?.type === "FOLDER" && (
                     <>
                         <li
                             className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white cursor-pointer transition-all duration-200"
-                            onClick={() => handleCreateEntityByRightClick("folder")}
+                            onClick={() => handleMenuClick("FOLDER")}
                         >
                             <FolderPlus className="w-4 h-4" /> New Folder
                         </li>
                         <li
                             className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white cursor-pointer transition-all duration-200"
-                            onClick={() => handleCreateEntityByRightClick("file")}
+                            onClick={() => handleMenuClick("FILE")}
                         >
                             <FilePlus className="w-4 h-4" /> New File
                         </li>
