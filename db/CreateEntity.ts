@@ -1,30 +1,19 @@
-import { entityCreationMethod } from "./../component/Sidebar/SideBar";
-import { handleCreateEntityType } from "@/component/Folder/ShowFolder";
 import { db } from "./db";
-import { RightMenuClickType } from "@/component/Folder/ContextMenu";
-
-type createAndUpdateEntityProps = {
-  name: string;
-  entity?: any;
-  type: "FOLDER" | "FILE";
-    rightClick?: RightMenuClickType;
-  entityCreationMethod: entityCreationMethod;
-  setContextMenu?: (menu: any) => void;
-};
+import { EntityCreationMethod, EntityCreationStateProps, RightMenuClick } from "@/types/types";
 
 const handleCreateAndUpdateEntity = async (
-  props: createAndUpdateEntityProps
+  props: EntityCreationStateProps
 ) => {
-  const { name, entity, type, rightClick, setContextMenu } = props;
-  if (!name.trim() || name.length > 20) {
+  const { entityName, entityCreationMethod, entity, rightMenuClick, setContextMenu } = props;
+  if (!entityName.trim() || entityName.length > 20) {
     return;
   }
 
-  if (rightClick === "RENAME") {
+  if (rightMenuClick === "RENAME") {
     if (entity?.parentId === null) return;
     if (entity?.type === "FOLDER") {
       await db.folders.update(entity?.parentId, {
-        folderName: name,
+        folderName: entityName,
         updatedAt: Date.now(),
       });
     }

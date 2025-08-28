@@ -1,4 +1,5 @@
 import { db, File, Folder } from '@/db/db';
+import { EntityCreationStateProps, EntityCreationType, RightMenuClick } from '@/types/types';
 import { EntityDelete } from '@/utils/EntityDelete';
 import {
     Download,
@@ -12,25 +13,27 @@ import {
     Trash2
 } from "lucide-react";
 import React from 'react';
-import { CreateEntityType } from '../Sidebar/SideBar';
-import { ContextMenuType } from './ShowFolder';
 
+interface ContextMenuProps {
+    entityCreationsState: EntityCreationStateProps | null;
+    setEntityCreationsState: (value: EntityCreationStateProps) => void;
+}
 
+export default function ContextMenu({ entityCreationsState, setEntityCreationsState }: ContextMenuProps) {
+    const { contextMenu } = entityCreationsState || {};
+    if (!contextMenu?.entity) return;
 
-export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange }:
-    {
-        contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean };
-        setContextMenu: React.Dispatch<React.SetStateAction<ContextMenuType>>;
-        handleCreateEntityTypeChange: (createEntityType: CreateEntityType) => void;
-    }) {
-
-    if (!contextMenu.entity) return;
-
-    const handleMenuClick = (menuType: RightMenuClickType, createType?: "FOLDER" | "FILE") => {
+    const handleMenuClick = (menuType: RightMenuClick, entityCreationType?: EntityCreationType) => {
         switch (menuType) {
             case "CREATE":
-                if (contextMenu.entity) {
-                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: createType || contextMenu.entity.type, parentId: contextMenu.entity.id });
+                if (contextMenu?.entity) {
+                    setEntityCreationsState({
+                        ...entityCreationsState!,
+                        entityCreationMethod: "RIGHTCLICK",
+                        entityCreationType: entityCreationType ?? (contextMenu.entity?.type),
+                        entity: contextMenu.entity,
+                        rightMenuClick: menuType,
+                    });
                 }
                 break;
 
@@ -41,12 +44,16 @@ export default function ContextMenu({ contextMenu, handleCreateEntityTypeChange 
                 break;
             case "RENAME":
                 console.log(contextMenu.entity, "contextMenu");
-
                 if (contextMenu.entity?.type) {
                     console.log("Renaming", contextMenu.entity.type);
-                    handleCreateEntityTypeChange({ createBy: "RIGHTCLICK", rightClickType: menuType, type: contextMenu.entity.type, parentId: contextMenu.entity.id });
+                    setEntityCreationsState({
+                        ...entityCreationsState!,
+                        entityCreationMethod: "RIGHTCLICK",
+                        entityCreationType: entityCreationType ?? (contextMenu.entity?.type),
+                        entity: contextMenu.entity,
+                        rightMenuClick: menuType,
+                    });
                 }
-                console.log("Rename");
                 break;
             case "SHARE":
                 console.log("Share");

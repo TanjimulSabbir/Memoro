@@ -4,19 +4,19 @@ import { EntityCreationStateProps, EntityCreationType } from '@/types/types';
 
 interface TopBoxProps {
     entityCreationsState: EntityCreationStateProps | null;
-    handleEntityCreationState: (value: EntityCreationStateProps) => void;
+    setEntityCreationsState: (value: EntityCreationStateProps) => void;
     handleSearchTextChange: (value: string) => void;
 };
 
 export default function TopBox({ props }: { props: TopBoxProps }) {
-    const { entityCreationsState, handleEntityCreationState, handleSearchTextChange } = props;
+    const { entityCreationsState, setEntityCreationsState, handleSearchTextChange } = props;
     return (
         <div className='mb-7 pt-4 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
                 <FolderPlus className={`cursor-pointer text-prime ${entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FOLDER" ? "text-sky-500" : ""}`}
-                    onClick={() => handleEntityCreationState({ entityCreationMethod: "BUTTON", entityCreationType: "FOLDER" })} />
+                    onClick={() => setEntityCreationsState({ entityCreationMethod: "BUTTON", entityCreationType: "FOLDER" })} />
                 <Folder className={`cursor-pointer text-prime ${entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FILE" ? "text-sky-500" : ""}`}
-                    onClick={() => handleEntityCreationState({ entityCreationMethod: "BUTTON", entityCreationType: "FILE" })} />
+                    onClick={() => setEntityCreationsState({ entityCreationMethod: "BUTTON", entityCreationType: "FILE" })} />
             </div>
             <div className='flex items-center'>
                 <input onChange={(e) => handleSearchTextChange(e.target.value)} type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />

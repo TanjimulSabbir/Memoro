@@ -3,25 +3,14 @@ import { useGetEntities } from "@/db/useGetEntities";
 import { useCallback, useEffect, useState } from "react";
 import ShowFolder from "../Folder/ShowFolder";
 import TopBox from "./TopBox";
-import { EntityCreationProps } from "@/types/types";
-
+import { EntityCreationStateProps } from "@/types/types";
 
 export default function SideBar() {
     // ✅ live query all entities as a nested tree
     const entities = useGetEntities();
-
-    const [entityCreationsState, setEntityCreationsState] = useState<EntityCreationProps | null>(null);
+    const [entityCreationsState, setEntityCreationsState] = useState<EntityCreationStateProps | null>(null);
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);
-
-    // ✅ update create entity type
-    const handleEntityCreationState = (entityCreationProps: EntityCreationProps, clearEntityCreationState?: boolean) => {
-        if (clearEntityCreationState) {
-            setEntityCreationsState(null);
-        } else {
-            setEntityCreationsState({ ...entityCreationProps });
-        }
-    };
 
     // ✅ debounce
     const debounce = (fn: (...args: any[]) => void, delay: number) => {
@@ -91,15 +80,18 @@ export default function SideBar() {
             <TopBox
                 props={{
                     entityCreationsState,
-                    handleEntityCreationState,
+                    setEntityCreationsState,
                     handleSearchTextChange
                 }}
             />
 
             <ShowFolder
-                createEntityType={createEntityType}
-                handleCreateEntityTypeChange={handleCreateEntityTypeChange}
-                data={results.length ? results : entities} // show filtered or full tree
+                props={{
+                    entityCreationsState,
+                    setEntityCreationsState,
+                    handleSearchTextChange,
+                    data: results.length ? results : entities
+                }}
             />
         </div>
     );

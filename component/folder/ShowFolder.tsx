@@ -5,43 +5,39 @@ import { useCallback, useEffect, useState } from "react";
 
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
+import { ContextMenu, EntityCreationStateProps } from "@/types/types";
+import ContextMenuComponent from "./ContextMenu";
+import EntityCreatingInput from "./EntityCreatingInput";
 
-// export type ChildEntity = (Folder | File) & { children: ChildEntity[] };
-
-export type handleCreateEntityType = {
-  name: string;
-  parentId: string | null;
-  type: "FOLDER" | "FILE";
-  entityCreationMethod: entityCreationMethod
-  rightClickType: RightMenuClickType | null
-}
-export default function ShowFolder({
-  createEntityType,
-  handleCreateEntityTypeChange,
-  data
-}: {
-  createEntityType: CreateEntityType;
-  handleCreateEntityTypeChange: (createEntityType: CreateEntityType) => void;
-  data: (Folder | File)[];
-}) {
+interface ShowFolderProps {
+  entityCreationsState: EntityCreationStateProps|null;
+  setEntityCreationsState: (value: EntityCreationStateProps) => void;
+  handleSearchTextChange: (value: string) => void;
+  data: any[];
+};
+export default function ShowFolder({ props }: { props: ShowFolderProps }) {
+  const { entityCreationsState, setEntityCreationsState, handleSearchTextChange, data } = props;
   const [note] = useState(""); // still state but not tied to keystrokes
-  const [contextMenu, setContextMenu] = useState<ContextMenu>({ entity: null, x: 0, y: 0, visible: false });
+  const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
 
-  const handleCreateEntity = useCallback(
-
-    [note, handleCreateEntityTypeChange]
-  );
-
-  const handleOnMenuContext = (e: React.MouseEvent<HTMLDivElement>, entity: Folder | File,) => {
+  const handleOnMenuContext = (e: React.MouseEvent<HTMLDivElement>, entity: any) => {
     e.preventDefault();
     setContextMenu({ entity, x: e.clientX, y: e.clientY, visible: true });
+    setEntityCreationsState({
+      ...entityCreationsState!,
+      entity: entity,
+      contextMenu: { entity, x: e.clientX, y: e.clientY, visible: true }
+    });
   };
-
-
 
   // Close menu on global click
   useEffect(() => {
-    const handleClickOutside = () => setContextMenu((c) => ({ ...c, visible: false }));
+    const handleClickOutside = () =>
+      setContextMenu((c) =>
+        c
+          ? { ...c, visible: false }
+          : null
+      );
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
@@ -50,13 +46,13 @@ export default function ShowFolder({
   return (
     <>
       {/* this is the create entity input while no parentId(first layer entity) */}
-      {createEntityType.createBy === "BUTTON" && (
+      {entityCreationsState?.entityCreationMethod === "BUTTON" && (
         <div className="mb-5">
-          <DynamicInput
-            entity={null}
-            createEntityType={createEntityType}
-            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, entityCreationMethod: createEntityType.createBy, rightClickType: null })}
-            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
+          <EntityCreatingInput
+            props={{
+              entityCreationsState,
+              entity: { parentId: null, type: entityCreationsState.entityCreationType },
+            }}
           />
         </div>
       )}
@@ -66,11 +62,12 @@ export default function ShowFolder({
           data.map((entity: (Folder | File)) => (
             <EntityRenderer
               key={entity.id}
-              entity={entity}
-              createEntityType={createEntityType}
-              handleCreateEntityTypeChange={handleCreateEntityTypeChange}
-              handleCreateEntity={handleCreateEntity}
-              handleOnMenuContext={handleOnMenuContext}
+              props={{
+                entity,
+                entityCreationsState,
+                setEntityCreationsState,
+                handleOnMenuContext
+              }}
             />
           ))
         ) : (
@@ -78,11 +75,10 @@ export default function ShowFolder({
         )}
       </ul>
       {/* This is right click menu */}
-      {contextMenu.visible && (
-        <ContextMenu
-          contextMenu={contextMenu}
-          setContextMenu={setContextMenu}
-          handleCreateEntityTypeChange={handleCreateEntityTypeChange}
+      {contextMenu?.visible && (
+        <ContextMenuComponent
+          entityCreationsState={entityCreationsState}
+          setEntityCreationsState={setEntityCreationsState}
         />
       )}
     </>

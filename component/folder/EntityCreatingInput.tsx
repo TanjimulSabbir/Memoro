@@ -1,27 +1,20 @@
 import { Input } from "@/components/ui/input";
+import { useGetFlatAllEntities } from "@/db/useGetEntities";
+import { EntityCreationStateProps } from "@/types/types";
 import { FileText, FolderIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import { CreateEntityType } from "../Sidebar/SideBar";
-import { useGetFlatAllEntities } from "@/db/useGetEntities";
-import { log } from "console";
 
 type DynamicInputProps = {
-    createEntityType: CreateEntityType;
+    entityCreationsState: EntityCreationStateProps|null;
     entity: any;
-    onSubmit: (value: string, type: "FOLDER" | "FILE") => void;
-    onCancel: (type: "FOLDER" | "FILE") => void;
     parentRef?: React.RefObject<HTMLDivElement | null>;
 };
 
-const DynamicInput: React.FC<DynamicInputProps> = ({
-    createEntityType,
-    entity,
-    onSubmit,
-    onCancel,
-    parentRef,
-}) => {
+const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
+    const { entityCreationsState } = props;
+    const { entity, entityCreationMethod, entityCreationType, rightMenuClick, contextMenu } = entityCreationsState || {};
     const [inputText, setInputText] = useState(
-        createEntityType.rightClickType === "RENAME"
+        entity?.rightClickType === "RENAME"
             ? entity?.folderName || entity?.fileName || ""
             : ""
     );
@@ -150,4 +143,4 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     );
 };
 
-export default DynamicInput;
+export default EntityCreatingInput;

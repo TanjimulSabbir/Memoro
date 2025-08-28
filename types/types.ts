@@ -7,7 +7,7 @@ export type FileAndChild = File & {
   children: (FolderAndChild & FileAndChild)[];
 };
 
-export type Entity = FolderAndChild & FileAndChild;
+export type Entity = FolderAndChild | FileAndChild;
 export type EntityCreationMethod = "BUTTON" | "RIGHTCLICK" | "INITIAL_CREATION";
 export type EntityCreationType = "FILE" | "FOLDER";
 export type RightMenuClick =
@@ -28,9 +28,11 @@ export type ContextMenu = {
   visible: boolean;
 };
 export type EntityCreationStateProps = {
-  entityCreationMethod: EntityCreationMethod;
-  entity?: Entity;
+  entityName?: string;
+  entityCreationMethod: EntityCreationMethod | null;
+  entity?: any;
   entityCreationType: EntityCreationType | null;
   rightMenuClick?: RightMenuClick | null;
-  contextMenu?: ContextMenu;
+    contextMenu?: ContextMenu;
+  setContextMenu?: (value: ContextMenu) => void;
 };
