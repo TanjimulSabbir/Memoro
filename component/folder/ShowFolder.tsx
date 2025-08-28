@@ -42,7 +42,7 @@ export default function ShowFolder({
       if (!name.trim() || name.length > 20) {
         return;
       }
-      console.log({ createEntityType, name, parentId, type, });
+      console.log({ createEntityType, handleCreate: { name, parentId, type, } });
 
       if (createEntityType.rightClickType === "RENAME" && createEntityType.parentId) {
 

@@ -51,7 +51,7 @@ export default function EntityRenderer({
                             placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
                             entityType={createEntityType.type}
                             onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
-                            // onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+                            entity={entity}
                             defaultValue={createEntityType.rightClickType === "RENAME" ? entity.folderName : ""}
                         />}
 
@@ -61,7 +61,7 @@ export default function EntityRenderer({
                             placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
                             entityType={createEntityType.type}
                             onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: null })}
-                        // onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+                            entity={entity}
                         />
                     )}
 
@@ -97,7 +97,7 @@ export default function EntityRenderer({
                         placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
                         entityType={createEntityType.type}
                         onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
-                        // onCancel={(type) => handleCreateEntityTypeChange(null, type)}
+                        entity={entity}
                         defaultValue={entity.fileName}
                     />}
 
