@@ -1,9 +1,9 @@
 import { Input } from "@/components/ui/input";
-import { useGetEntities } from "@/db/useGetEntities";
-import { log } from "console";
 import { FileText, FolderIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { CreateEntityType } from "../Sidebar/SideBar";
+import { useGetFlatAllEntities } from "@/db/useGetEntities";
+import { log } from "console";
 
 type DynamicInputProps = {
     createEntityType: CreateEntityType;
@@ -27,45 +27,49 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     );
     const [error, setError] = useState("");
     const wrapperRef = useRef<HTMLDivElement>(null);
-
-    const entities = useGetEntities();
+    // const [allFlatData, setAllFlatData] = useState<any[]>([]);
+    const allFlatData = useGetFlatAllEntities();
 
     // put these tiny helpers at module scope if you like
     const normalize = (text?: string) => (text ?? "").trim().toLowerCase();
     const getEntityName = (entity: any) => entity?.folderName ?? entity?.fileName ?? "";
 
     const checkDuplicate = (): boolean => {
-        if (!entities || !inputText.trim()) return false;
+        if (!allFlatData || !inputText.trim()) return false;
+        console.log(allFlatData, "entities");
 
         const target = normalize(inputText);
 
 
         // Check for duplicates in the root level
-        if (entity.parentId === null) {
-            if (entities.some((e) => e.parentId === null && normalize(getEntityName(e)) === target)) {
+        if (entity?.parentId === null) {
+            const nullEntities = allFlatData.filter((e) => e.parentId === null);
+            if (nullEntities.some((e) => normalize(getEntityName(e)) === target && e.id !== entity.id)) {
                 return true;
             }
         }
 
         // 1) Parent name (parent is always a folder in typical trees)
         if (entity?.parentId) {
-            const parent = entities.find((e) => e.id === entity.parentId);
-            if (parent && normalize(getEntityName(parent)) === target) {
+            const parent = allFlatData.find((e) => e.parentId === entity?.parentId);
+            if (parent && normalize(getEntityName(parent)) === target && parent.id !== entity?.parentId) {
                 return true;
             }
         }
 
         // parent children (siblings)
-        if (entity.parentId) {
-            const siblings = entities.find((e) => e.id === entity.parentId)?.children;
-            if (siblings && siblings.some((sibling: any) => normalize(getEntityName(sibling)) === target)) {
+        if (entity?.parentId) {
+            const siblings = allFlatData.filter((e) => e.parentId === entity.parentId);
+            if (siblings && siblings.some((sibling: any) => normalize(getEntityName(sibling)) === target && sibling.id !== entity.id)) {
                 return true;
             }
         }
 
         // Entity's own Children
-        const children: any[] = Array.isArray(entity?.children) ? entity!.children : [];
-        if (children.some((c) => normalize(getEntityName(c)) === target)) {
+        const children: any[] = allFlatData.filter((e) => e.parentId === entity?.id);
+        console.log(children, "children");
+
+        if (children.some((c) => normalize(getEntityName(c)) === target && c.id !== entity?.id)) {
             return true;
         }
 
@@ -107,10 +111,10 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
 
         window.addEventListener("mousedown", handleClickOutside);
         return () => window.removeEventListener("mousedown", handleClickOutside);
-    }, [inputText, createEntityType, entities]);
+    }, [inputText, createEntityType]);
 
     return (
-        <div ref={wrapperRef} className="relative flex items-center space-x-1 font-Domine">
+        <div ref={wrapperRef} className={`${createEntityType.rightClickType == "CREATE" && "mt-3"} relative flex items-center space-x-1 font-Domine`}>
             <p className="absolute top-1.5 left-0">
                 {createEntityType.type === "FOLDER" ? (
                     <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />

@@ -1,24 +1,22 @@
 import { Folder, FolderPlus, Mic, Search } from 'lucide-react'
 import "../../styles/searchbox.css"
-import { CreateEntityType } from './SideBar'
+import { EntityCreationStateProps, EntityCreationType } from '@/types/types';
 
-export default function TopBox({
-    createEntityType,
-    handleCreateEntityTypeChange,
-    handleSearchTextChange
-}: {
-    createEntityType: CreateEntityType;
-    handleCreateEntityTypeChange: (createEntityType: CreateEntityType) => void;
-    handleSearchTextChange: (value: string) => void
-}) {
+interface TopBoxProps {
+    entityCreationsState: EntityCreationStateProps | null;
+    handleEntityCreationState: (value: EntityCreationStateProps) => void;
+    handleSearchTextChange: (value: string) => void;
+};
 
+export default function TopBox({ props }: { props: TopBoxProps }) {
+    const { entityCreationsState, handleEntityCreationState, handleSearchTextChange } = props;
     return (
         <div className='mb-7 pt-4 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
-                <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "FOLDER" ? "text-sky-500" : ""}`}
-                    onClick={() => handleCreateEntityTypeChange({ createBy: "BUTTON", type: "FOLDER", parentId: null, rightClickType: "FOLDER" })} />
-                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "FILE" ? "text-sky-500" : ""}`}
-                    onClick={() => handleCreateEntityTypeChange({ createBy: "BUTTON", type: "FILE", parentId: null, rightClickType: "FILE" })} />
+                <FolderPlus className={`cursor-pointer text-prime ${entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FOLDER" ? "text-sky-500" : ""}`}
+                    onClick={() => handleEntityCreationState({ entityCreationMethod: "BUTTON", entityCreationType: "FOLDER" })} />
+                <Folder className={`cursor-pointer text-prime ${entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FILE" ? "text-sky-500" : ""}`}
+                    onClick={() => handleEntityCreationState({ entityCreationMethod: "BUTTON", entityCreationType: "FILE" })} />
             </div>
             <div className='flex items-center'>
                 <input onChange={(e) => handleSearchTextChange(e.target.value)} type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />

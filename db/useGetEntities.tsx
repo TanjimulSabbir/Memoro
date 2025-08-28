@@ -39,3 +39,15 @@ export function useGetEntities() {
 
     return entities;
 }
+
+export function useGetFlatAllEntities() {
+    const allFlatData = useLiveQuery(async () => {
+        const [folders, files] = await Promise.all([
+            db.folders.toArray(),
+            db.files.toArray(),
+        ]);
+        return [...folders, ...files];
+    }, [], []);
+
+    return allFlatData;
+}

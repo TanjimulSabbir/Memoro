@@ -49,7 +49,7 @@ export default function EntityRenderer({
                             {entity.children && entity.children.length > 0 && <LucideChevronLeft className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
                         </div> : <DynamicInput
                             createEntityType={createEntityType}
-                            onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
+                            onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.parentId, type, entityCreationMethod: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
                             entity={entity}
                             onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
                             parentRef={parentRef}
@@ -59,7 +59,7 @@ export default function EntityRenderer({
                     {createEntityType.rightClickType === "CREATE" && entity.id === createEntityType.parentId && (
                         <DynamicInput
                             createEntityType={createEntityType}
-                            onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: null })}
+                            onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: createEntityType.rightClickType ? createEntityType.parentId : entity.id, type, entityCreationMethod: createEntityType.createBy, rightClickType: null })}
                             entity={entity}
                             onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
                             parentRef={parentRef}
@@ -96,7 +96,7 @@ export default function EntityRenderer({
                         <span>{entity.fileName}</span>
                     </p> : <DynamicInput
                         createEntityType={createEntityType}
-                        onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
+                        onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: createEntityType.rightClickType ? createEntityType.parentId : entity.id, type: "FILE", entityCreationMethod: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
                         entity={entity}
                         onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
                         parentRef={parentRef}

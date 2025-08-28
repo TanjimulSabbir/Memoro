@@ -1,30 +1,27 @@
 "use client";
 import { useGetEntities } from "@/db/useGetEntities";
-import { log } from "console";
 import { useCallback, useEffect, useState } from "react";
-import { RightMenuClickType } from "../Folder/ContextMenu";
 import ShowFolder from "../Folder/ShowFolder";
 import TopBox from "./TopBox";
-
-export type createdBy = "BUTTON" | "RIGHTCLICK" | null
-export type CreateEntityType = {
-    createBy: createdBy;
-    type: "FILE" | "FOLDER";
-    parentId: string | null;
-    rightClickType: RightMenuClickType | null
-}
+import { EntityCreationProps } from "@/types/types";
 
 
 export default function SideBar() {
     // ✅ live query all entities as a nested tree
     const entities = useGetEntities();
 
-    const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "FOLDER", parentId: null, rightClickType: null });
+    const [entityCreationsState, setEntityCreationsState] = useState<EntityCreationProps | null>(null);
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);
 
     // ✅ update create entity type
-    const handleCreateEntityTypeChange = (createEntityType: CreateEntityType) => (setCreateEntityType({ ...createEntityType }));
+    const handleEntityCreationState = (entityCreationProps: EntityCreationProps, clearEntityCreationState?: boolean) => {
+        if (clearEntityCreationState) {
+            setEntityCreationsState(null);
+        } else {
+            setEntityCreationsState({ ...entityCreationProps });
+        }
+    };
 
     // ✅ debounce
     const debounce = (fn: (...args: any[]) => void, delay: number) => {
@@ -92,9 +89,11 @@ export default function SideBar() {
     return (
         <div className="relative w-full max-w-[280px] border-r border-prime px-3 min-h-screen">
             <TopBox
-                createEntityType={createEntityType}
-                handleCreateEntityTypeChange={handleCreateEntityTypeChange}
-                handleSearchTextChange={handleSearchTextChange}
+                props={{
+                    entityCreationsState,
+                    handleEntityCreationState,
+                    handleSearchTextChange
+                }}
             />
 
             <ShowFolder

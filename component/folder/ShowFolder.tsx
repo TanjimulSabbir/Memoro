@@ -1,24 +1,18 @@
 "use client";
 
-import { db, File, Folder } from "@/db/db";
+import { File, Folder } from "@/db/db";
 import { useCallback, useEffect, useState } from "react";
-import { createdBy, CreateEntityType } from "../Sidebar/SideBar";
-import ContextMenu, { RightMenuClickType } from "./ContextMenu";
+
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
 
 // export type ChildEntity = (Folder | File) & { children: ChildEntity[] };
-export type ContextMenuType = {
-  entity: any
-  x: number;
-  y: number;
-  visible: boolean
-}
+
 export type handleCreateEntityType = {
   name: string;
   parentId: string | null;
   type: "FOLDER" | "FILE";
-  createdBy: createdBy
+  entityCreationMethod: entityCreationMethod
   rightClickType: RightMenuClickType | null
 }
 export default function ShowFolder({
@@ -31,53 +25,10 @@ export default function ShowFolder({
   data: (Folder | File)[];
 }) {
   const [note] = useState(""); // still state but not tied to keystrokes
-  const [contextMenu, setContextMenu] = useState<ContextMenuType>({ entity: null, x: 0, y: 0, visible: false });
+  const [contextMenu, setContextMenu] = useState<ContextMenu>({ entity: null, x: 0, y: 0, visible: false });
 
   const handleCreateEntity = useCallback(
-    async (handleCreateEntityType: handleCreateEntityType) => {
-      const { name, parentId, type, } = handleCreateEntityType;
-      console.log({ handleCreateEntityType, createEntityType, contextMenu: contextMenu.entity });
 
-      if (!name.trim() || name.length > 20) {
-        return;
-      }
-
-      if (createEntityType.rightClickType === "RENAME" && createEntityType.parentId) {
-
-        if (createEntityType.parentId === null) return;
-        if (createEntityType.type === "FOLDER") {
-          await db.folders.update(createEntityType.parentId, { folderName: name });
-        }
-        if (createEntityType.type === "FILE") {
-          await db.files.update(createEntityType.parentId, { fileName: name });
-        }
-        return handleCreateEntityTypeChange({ createBy: null, rightClickType: null, type, parentId: null });
-      }
-
-      const now = Date.now();
-      if (type === "FOLDER") {
-        await db.folders.add({
-          id: crypto.randomUUID(),
-          parentId,
-          folderName: name,
-          createdAt: now,
-          updatedAt: now,
-          type: "FOLDER" as const,
-        });
-      } else {
-        await db.files.add({
-          id: crypto.randomUUID(),
-          parentId,
-          fileName: name,
-          note: note,
-          createdAt: now,
-          updatedAt: now,
-          type: "FILE" as const,
-        });
-      }
-
-      handleCreateEntityTypeChange({ createBy: null, rightClickType: null, type, parentId: null });
-    },
     [note, handleCreateEntityTypeChange]
   );
 
@@ -104,7 +55,7 @@ export default function ShowFolder({
           <DynamicInput
             entity={null}
             createEntityType={createEntityType}
-            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, createdBy: createEntityType.createBy, rightClickType: null })}
+            onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, entityCreationMethod: createEntityType.createBy, rightClickType: null })}
             onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
           />
         </div>
