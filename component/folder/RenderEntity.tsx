@@ -1,7 +1,7 @@
 "use client";
 
 import { FileText, FolderIcon, LucideChevronLeft } from "lucide-react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { CreateEntityType } from "../Sidebar/SideBar";
 import DynamicInput from "./EntityCreatingInput";
 import { handleCreateEntityType } from "./ShowFolder";
@@ -28,6 +28,7 @@ export default function EntityRenderer({
         setIsOpen(!isOpen);
     };
     // console.log("Toggled folder", createEntityType, entity);
+    const parentRef = useRef<HTMLDivElement>(null);
     return (
         <li className="flex flex-col gap-2 group mt-2 rounded group pr-1 py-0.5 hover:bg-muted/10 transition">
             {entity.type === "FOLDER" ? (
@@ -35,7 +36,7 @@ export default function EntityRenderer({
                     {/* here all the folder is rendering and onClick open and closing the folder. OnContext */}
                     {!(createEntityType.rightClickType === "RENAME" && createEntityType.parentId === entity.id) ?
 
-                        <div className="flex items-center justify-between cursor-pointer"
+                        <div ref={parentRef} className="flex items-center justify-between cursor-pointer"
                             onClick={toggleFolder}
                             onContextMenu={(e) => {
                                 e.preventDefault();
@@ -48,20 +49,21 @@ export default function EntityRenderer({
                             </p>
                             {entity.children && entity.children.length > 0 && <LucideChevronLeft className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
                         </div> : <DynamicInput
-                            placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
-                            entityType={createEntityType.type}
+                            createEntityType={createEntityType}
                             onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
                             entity={entity}
-                            defaultValue={createEntityType.rightClickType === "RENAME" ? entity.folderName : ""}
+                            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
+                            parentRef={parentRef}
                         />}
 
                     {/* Creating Entity matched with entity id*/}
                     {createEntityType.rightClickType === "CREATE" && entity.id === createEntityType.parentId && (
                         <DynamicInput
-                            placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
-                            entityType={createEntityType.type}
+                            createEntityType={createEntityType}
                             onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: null })}
                             entity={entity}
+                            onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
+                            parentRef={parentRef}
                         />
                     )}
 
@@ -89,16 +91,16 @@ export default function EntityRenderer({
                 }}>
                     {/* File */}
                     {!(createEntityType.rightClickType === "RENAME" && createEntityType.parentId == entity.id) ? <p
-                        className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
+                        ref={parentRef} className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
                     >
                         <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
                         <span>{entity.fileName}</span>
                     </p> : <DynamicInput
-                        placeholder={createEntityType.type === "FOLDER" ? "New folder name" : "New file name"}
-                        entityType={createEntityType.type}
+                        createEntityType={createEntityType}
                         onSubmit={(val, type) => handleCreateEntity({ name: val, parentId: entity.id, type, createdBy: createEntityType.createBy, rightClickType: createEntityType.rightClickType })}
                         entity={entity}
-                        defaultValue={entity.fileName}
+                        onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
+                        parentRef={parentRef}
                     />}
 
                 </div>

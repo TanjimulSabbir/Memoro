@@ -42,7 +42,6 @@ export default function ShowFolder({
       if (!name.trim() || name.length > 20) {
         return;
       }
-      console.log({ createEntityType, handleCreate: { name, parentId, type, } });
 
       if (createEntityType.rightClickType === "RENAME" && createEntityType.parentId) {
 
@@ -104,8 +103,8 @@ export default function ShowFolder({
       {createEntityType.createBy === "BUTTON" && (
         <div className="mb-5">
           <DynamicInput
-            entityType={createEntityType.type}
-            placeholder={createEntityType.type === "FOLDER" ? "Create New Folder" : "Create New File"}
+            entity={null}
+            createEntityType={createEntityType}
             onSubmit={(val) => handleCreateEntity({ name: val, parentId: null, type: createEntityType.type, createdBy: createEntityType.createBy, rightClickType: null })}
             onCancel={(type) => handleCreateEntityTypeChange({ createBy: null, type, parentId: null, rightClickType: null })}
           />
