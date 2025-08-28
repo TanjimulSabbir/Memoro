@@ -11,7 +11,7 @@ import EntityCreatingInput from "./EntityCreatingInput";
 
 interface ShowFolderProps {
   entityCreationsState: EntityCreationStateProps|null;
-  setEntityCreationsState: (value: EntityCreationStateProps) => void;
+  setEntityCreationsState: (value: EntityCreationStateProps|null) => void;
   handleSearchTextChange: (value: string) => void;
   data: any[];
 };

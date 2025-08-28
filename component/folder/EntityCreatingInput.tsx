@@ -6,7 +6,7 @@ import { FileText, FolderIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 type DynamicInputProps = {
-    setEntityCreationsState: (value: EntityCreationStateProps) => void;
+    setEntityCreationsState: (value: EntityCreationStateProps | null) => void;
     entityCreationsState: EntityCreationStateProps | null;
     entity: any;
     parentRef?: React.RefObject<HTMLDivElement | null>;
@@ -88,7 +88,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
         }
 
         setError("");
-        handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState);
+        return handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState, trimmed);
     };
 
     // ✅ Outside click: submit or cancel
@@ -128,7 +128,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter") handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState);
+                        if (e.key === "Enter") return handleSubmit();
                         if (e.key === "Escape") setEntityCreationsState({ entityName: "", entityCreationMethod: null, entityCreationType: null, entity: null, rightMenuClick: null, contextMenu: { entity: null, x: 0, y: 0, visible: false } });
                     }}
                     autoFocus

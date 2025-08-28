@@ -8,7 +8,7 @@ import DynamicInput from "./EntityCreatingInput";
 interface EntityRendererProps {
     entity: any;
     entityCreationsState: EntityCreationStateProps | null;
-    setEntityCreationsState: (value: EntityCreationStateProps) => void;
+    setEntityCreationsState: (value: EntityCreationStateProps | null) => void;
     handleOnMenuContext: (e: React.MouseEvent<HTMLDivElement>, entity: any) => void;
 }
 
@@ -28,7 +28,7 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
             {entity.type === "FOLDER" ? (
                 <div className="w-full">
                     {/* here all the folder is rendering and onClick open and closing the folder. OnContext */}
-                    {!(inputOpen.includes(entityCreationMethod ?? "") && entity.id === contextMenu?.entity?.id) ?
+                    {!(rightMenuClick === "RENAME" && entity.id === contextMenu?.entity?.id) ?
                         (
                             <div ref={parentRef} className="flex items-center justify-between cursor-pointer"
                                 onClick={toggleFolder}
@@ -52,6 +52,14 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                                 setEntityCreationsState
                             }}
                         />}
+                    {rightMenuClick === "CREATE" && entity.id === contextMenu?.entity?.id && <DynamicInput
+                        props={{
+                            entityCreationsState,
+                            entity: entity,
+                            parentRef: parentRef,
+                            setEntityCreationsState
+                        }}
+                    />}
 
                     {/* Render children recursively if folder is open */}
                     {isOpen && entity.children && entity.children.length > 0 && (
@@ -77,7 +85,7 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                     handleOnMenuContext(e, entity); // correct order ✅
                 }}>
                     {/* File */}
-                    {!(inputOpen.includes(entityCreationMethod ?? "") && entity.id === contextMenu?.entity?.id) ? (
+                    {!(rightMenuClick === "RENAME" && entity.id === contextMenu?.entity?.id) ? (
                         <p
                             ref={parentRef} className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
                         >
@@ -94,7 +102,14 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                             }}
                         />
                     )}
-
+                    {rightMenuClick === "CREATE" && entity.id === contextMenu?.entity?.id && <DynamicInput
+                        props={{
+                            entityCreationsState,
+                            entity: entity,
+                            parentRef: parentRef,
+                            setEntityCreationsState
+                        }}
+                    />}
                 </div>
             )}
         </li>

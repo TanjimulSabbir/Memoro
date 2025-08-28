@@ -1,70 +1,69 @@
 import { db } from "./db";
-import {
-  EntityCreationMethod,
-  EntityCreationStateProps,
-  RightMenuClick,
-} from "@/types/types";
+import { EntityCreationStateProps } from "@/types/types";
 
-interface props {
-  createEntityState: EntityCreationStateProps | null;
-  setEntityCreationsState: (value: EntityCreationStateProps) => void;
-}
-
-export const handleCreateAndUpdateEntity = async (createEntityState: EntityCreationStateProps | null, setEntityCreationsState: (value: EntityCreationStateProps) => void) => {
+export const handleCreateAndUpdateEntity = async (
+  createEntityState: EntityCreationStateProps | null,
+  setEntityCreationsState: (value: EntityCreationStateProps | null) => void,
+  entityName: string
+) => {
   const {
-    entityName,
     entityCreationMethod,
     entity,
     entityCreationType,
     rightMenuClick,
+    contextMenu,
     setContextMenu,
   } = createEntityState || {};
 
-  if (!entityName?.trim() || entityName?.length > 20) {
-    return;
+  console.log(createEntityState, entityName, "entity log");
+
+  if (!entityName?.trim() || entityName?.length > 20) return;
+
+  // 🔹 RENAME FLOW
+  if (rightMenuClick === "RENAME") {
+    if (!entity || entity.parentId === null) return;
+
+    if (entityCreationType === "FOLDER") {
+      await db.folders.update(entity.id, {
+        folderName: entityName,
+        updatedAt: Date.now(),
+      });
+    }
+    if (entityCreationType === "FILE") {
+      await db.files.update(entity.id, {
+        fileName: entityName,
+        updatedAt: Date.now(),
+      });
+    }
+
+    return setEntityCreationsState(null);
   }
 
-  if (rightMenuClick === "RENAME") {
-    if (entity?.parentId === null) return;
-    if (entity?.type === "FOLDER") {
-      await db.folders.update(entity?.parentId, {
-        folderName: entityName,
-        updatedAt: Date.now(),
-      });
-    }
-    if (entity?.type === "FILE") {
-      await db.files.update(entity?.parentId, {
-        fileName: entityName,
-        updatedAt: Date.now(),
-      });
-    }
-    setContextMenu &&
-      setContextMenu({ entity: null, x: 0, y: 0, visible: false });
-  }
-  if (entityCreationMethod === "BUTTON" || entityCreationMethod === null) {
-    const now = Date.now();
-    if (entityCreationType === "FOLDER") {
-      await db.folders.add({
-        id: crypto.randomUUID(),
-        parentId: null,
-        folderName: entityName,
-        createdAt: now,
-        updatedAt: now,
-        type: "FOLDER" as const,
-      });
-    } else {
-      await db.files.add({
-        id: crypto.randomUUID(),
-        parentId: null,
-        fileName: entityName,
-        note: "this is a note",
-        createdAt: now,
-        updatedAt: now,
-        type: "FILE" as const,
-      });
-    }
-    setContextMenu &&
-      setContextMenu({ entity: null, x: 0, y: 0, visible: false });
+  // 🔹 CREATE FLOW
+
+  const now = Date.now();
+
+  if (entityCreationType === "FOLDER") {
+    await db.folders.add({
+      id: crypto.randomUUID(),
+      parentId: entity?.parentId ?? null,
+      folderName: entityName,
+      createdAt: now,
+      updatedAt: now,
+      type: "FOLDER" as const,
+    });
+  } else if (entityCreationType === "FILE") {
+    await db.files.add({
+      id: crypto.randomUUID(),
+      parentId: entity?.parentId ?? null,
+      fileName: entityName,
+      note: "this is a note",
+      createdAt: now,
+      updatedAt: now,
+      type: "FILE" as const,
+    });
+
+    // reset
     return setEntityCreationsState(null);
   }
 };
