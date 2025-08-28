@@ -1,11 +1,10 @@
 "use client";
-import { db } from "@/db/db";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useCallback, useEffect, useState } from "react";
-import ShowFolder from "../folder/ShowFolder";
-import TopBox from "./TopBox";
-import { RightMenuClickType } from "../folder/ContextMenu";
 import { useGetEntities } from "@/db/useGetEntities";
+import { log } from "console";
+import { useCallback, useEffect, useState } from "react";
+import { RightMenuClickType } from "../Folder/ContextMenu";
+import ShowFolder from "../Folder/ShowFolder";
+import TopBox from "./TopBox";
 
 export type createdBy = "BUTTON" | "RIGHTCLICK" | null
 export type CreateEntityType = {
@@ -21,7 +20,6 @@ export default function SideBar() {
     const entities = useGetEntities();
 
     const [createEntityType, setCreateEntityType] = useState<CreateEntityType>({ createBy: null, type: "FOLDER", parentId: null, rightClickType: null });
-
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);
 
@@ -52,7 +50,6 @@ export default function SideBar() {
             setResults([]);
             return;
         }
-
         // recursive search including all children of a matched folder
         const searchTree = (nodes: any[]): any[] => {
             const res: any[] = [];
@@ -90,11 +87,10 @@ export default function SideBar() {
         setResults(filtered);
     }, [searchText, entities]);
 
-    console.log({ createEntityType }, "from createEntityType");
 
 
     return (
-        <div className="relative w-full max-w-[280px] border-r border-gray-300 px-3 min-h-screen">
+        <div className="relative w-full max-w-[280px] border-r border-prime px-3 min-h-screen">
             <TopBox
                 createEntityType={createEntityType}
                 handleCreateEntityTypeChange={handleCreateEntityTypeChange}

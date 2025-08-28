@@ -13,11 +13,12 @@ export default function TopBox({
 }) {
 
     return (
-        <div className='mb-7 pt-5 flex items-center gap-3'>
+        <div className='mb-7 pt-4 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
                 <FolderPlus className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "FOLDER" ? "text-sky-500" : ""}`}
-                    onClick={() => handleCreateEntityTypeChange({ createBy: "BUTTON", type: "FOLDER", parentId: null })} />
-                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "FILE" ? "text-sky-500" : ""}`} onClick={() => handleCreateEntityTypeChange({ createBy: "BUTTON", type: "FILE", parentId: null })} />
+                    onClick={() => handleCreateEntityTypeChange({ createBy: "BUTTON", type: "FOLDER", parentId: null, rightClickType: "FOLDER" })} />
+                <Folder className={`cursor-pointer text-prime ${createEntityType.createBy === "BUTTON" && createEntityType.type === "FILE" ? "text-sky-500" : ""}`}
+                    onClick={() => handleCreateEntityTypeChange({ createBy: "BUTTON", type: "FILE", parentId: null, rightClickType: "FILE" })} />
             </div>
             <div className='flex items-center'>
                 <input onChange={(e) => handleSearchTextChange(e.target.value)} type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />

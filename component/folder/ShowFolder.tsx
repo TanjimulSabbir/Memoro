@@ -1,7 +1,6 @@
 "use client";
 
 import { db, File, Folder } from "@/db/db";
-import { log } from "console";
 import { useCallback, useEffect, useState } from "react";
 import { createdBy, CreateEntityType } from "../Sidebar/SideBar";
 import ContextMenu, { RightMenuClickType } from "./ContextMenu";
@@ -29,7 +28,7 @@ export default function ShowFolder({
 }: {
   createEntityType: CreateEntityType;
   handleCreateEntityTypeChange: (createEntityType: CreateEntityType) => void;
-  data?: (Folder | File)[];
+  data: (Folder | File)[];
 }) {
   const [note] = useState(""); // still state but not tied to keystrokes
   const [contextMenu, setContextMenu] = useState<ContextMenuType>({ entity: null, x: 0, y: 0, visible: false });
@@ -112,7 +111,7 @@ export default function ShowFolder({
       )}
       {/* This is the list of entities */}
       <ul>
-        {data && data?.length > 0 ? (
+        {data?.length > 0 ? (
           data.map((entity: (Folder | File)) => (
             <EntityRenderer
               key={entity.id}

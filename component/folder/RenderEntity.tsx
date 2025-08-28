@@ -27,7 +27,6 @@ export default function EntityRenderer({
         e.stopPropagation();
         setIsOpen(!isOpen);
     };
-    // console.log("Toggled folder", createEntityType, entity);
     const parentRef = useRef<HTMLDivElement>(null);
     return (
         <li className="flex flex-col gap-2 group mt-2 rounded group pr-1 py-0.5 hover:bg-muted/10 transition">
@@ -69,7 +68,7 @@ export default function EntityRenderer({
 
                     {/* Render children recursively if folder is open */}
                     {isOpen && entity.children && entity.children.length > 0 && (
-                        <ul className="ml-2 border-l border-muted/50 pl-1 mt-1">
+                        <ul className="ml-2 pl-1 mt-1">
                             {entity.children.map((child: any) => (
                                 <EntityRenderer
                                     key={child.id}
