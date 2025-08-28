@@ -1,18 +1,21 @@
 import { Input } from "@/components/ui/input";
+import { handleCreateAndUpdateEntity } from "@/db/CreateEntity";
 import { useGetFlatAllEntities } from "@/db/useGetEntities";
 import { EntityCreationStateProps } from "@/types/types";
 import { FileText, FolderIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 type DynamicInputProps = {
-    entityCreationsState: EntityCreationStateProps|null;
+    setEntityCreationsState: (value: EntityCreationStateProps) => void;
+    entityCreationsState: EntityCreationStateProps | null;
     entity: any;
     parentRef?: React.RefObject<HTMLDivElement | null>;
+
 };
 
 const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
-    const { entityCreationsState } = props;
-    const { entity, entityCreationMethod, entityCreationType, rightMenuClick, contextMenu } = entityCreationsState || {};
+    const { entity, entityCreationsState, setEntityCreationsState, parentRef } = props;
+    const { entityCreationMethod, entityCreationType, rightMenuClick, contextMenu } = entityCreationsState || {};
     const [inputText, setInputText] = useState(
         entity?.rightClickType === "RENAME"
             ? entity?.folderName || entity?.fileName || ""
@@ -85,7 +88,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
         }
 
         setError("");
-        onSubmit(trimmed, createEntityType.type);
+        handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState);
     };
 
     // ✅ Outside click: submit or cancel
@@ -95,8 +98,8 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
             if (wrapperRef.current?.contains(target)) return;
             if (parentRef?.current?.contains(target)) return;
 
-            if (!inputText.trim() || createEntityType.rightClickType === "RENAME") {
-                onCancel?.(createEntityType.type);
+            if (!inputText.trim() || rightMenuClick === "RENAME") {
+                setEntityCreationsState({ entityName: "", entityCreationMethod: null, entityCreationType: null, entity: null, rightMenuClick: null, contextMenu: { entity: null, x: 0, y: 0, visible: false } });
             } else {
                 handleSubmit();
             }
@@ -104,12 +107,12 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
 
         window.addEventListener("mousedown", handleClickOutside);
         return () => window.removeEventListener("mousedown", handleClickOutside);
-    }, [inputText, createEntityType]);
+    }, [inputText, rightMenuClick]);
 
     return (
-        <div ref={wrapperRef} className={`${createEntityType.rightClickType == "CREATE" && "mt-3"} relative flex items-center space-x-1 font-Domine`}>
+        <div ref={wrapperRef} className={`${rightMenuClick == "CREATE" && "mt-3"} relative flex items-center space-x-1 font-Domine`}>
             <p className="absolute top-1.5 left-0">
-                {createEntityType.type === "FOLDER" ? (
+                {entityCreationType === "FOLDER" ? (
                     <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
                 ) : (
                     <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
@@ -118,15 +121,15 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
             <div className="flex flex-col w-full pl-6">
                 <Input
                     placeholder={
-                        createEntityType.type === "FOLDER"
+                        entityCreationType === "FOLDER"
                             ? "New folder name"
                             : "New file name"
                     }
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === "Enter") handleSubmit();
-                        if (e.key === "Escape") onCancel?.(createEntityType.type);
+                        if (e.key === "Enter") handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState);
+                        if (e.key === "Escape") setEntityCreationsState({ entityName: "", entityCreationMethod: null, entityCreationType: null, entity: null, rightMenuClick: null, contextMenu: { entity: null, x: 0, y: 0, visible: false } });
                     }}
                     autoFocus
                     aria-invalid={!!error}

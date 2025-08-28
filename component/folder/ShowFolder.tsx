@@ -52,6 +52,7 @@ export default function ShowFolder({ props }: { props: ShowFolderProps }) {
             props={{
               entityCreationsState,
               entity: { parentId: null, type: entityCreationsState.entityCreationType },
+              setEntityCreationsState
             }}
           />
         </div>

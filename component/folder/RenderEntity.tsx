@@ -28,30 +28,30 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
             {entity.type === "FOLDER" ? (
                 <div className="w-full">
                     {/* here all the folder is rendering and onClick open and closing the folder. OnContext */}
-                    <div ref={parentRef} className="flex items-center justify-between cursor-pointer"
-                        onClick={toggleFolder}
-                        onContextMenu={(e) => {
-                            e.preventDefault();
-                            handleOnMenuContext(e, entity);
-                        }}>
-                        <p className="flex items-center space-x-1 text-black dark:text-white text-sm font-PtSerif"
-                        >
-                            <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
-                            <span>{entity.folderName}</span>
-                        </p>
-                        {entity.children && entity.children.length > 0 && <LucideChevronLeft className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
-                    </div>
-
-                    {/* Creating Entity matched with entity id*/}
-                    {inputOpen.includes(entityCreationMethod ?? "") && entity.id === contextMenu?.entity?.id && (
+                    {!(inputOpen.includes(entityCreationMethod ?? "") && entity.id === contextMenu?.entity?.id) ?
+                        (
+                            <div ref={parentRef} className="flex items-center justify-between cursor-pointer"
+                                onClick={toggleFolder}
+                                onContextMenu={(e) => {
+                                    e.preventDefault();
+                                    handleOnMenuContext(e, entity);
+                                }}>
+                                <p className="flex items-center space-x-1 text-black dark:text-white text-sm font-PtSerif"
+                                >
+                                    <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
+                                    <span>{entity.folderName}</span>
+                                </p>
+                                {entity.children && entity.children.length > 0 && <LucideChevronLeft className={`w-3 h-3 ${isOpen ? "rotate-90" : "rotate-180"} duration-300 transition-transform`} />}
+                            </div>
+                        ) :
                         <DynamicInput
                             props={{
                                 entityCreationsState,
                                 entity: entity,
-                                parentRef: parentRef
+                                parentRef: parentRef,
+                                setEntityCreationsState
                             }}
-                        />
-                    )}
+                        />}
 
                     {/* Render children recursively if folder is open */}
                     {isOpen && entity.children && entity.children.length > 0 && (
@@ -77,21 +77,24 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                     handleOnMenuContext(e, entity); // correct order ✅
                 }}>
                     {/* File */}
-                    <p
-                        ref={parentRef} className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
-                    >
-                        <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
-                        <span>{entity.fileName}</span>
-                    </p>
-                    {inputOpen.includes(entityCreationMethod ?? "") && entity.id === contextMenu?.entity?.id && (
+                    {!(inputOpen.includes(entityCreationMethod ?? "") && entity.id === contextMenu?.entity?.id) ? (
+                        <p
+                            ref={parentRef} className="flex items-center text-black dark:text-white font-PtSerif space-x-1 text-sm cursor-pointer"
+                        >
+                            <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
+                            <span>{entity.fileName}</span>
+                        </p>
+                    ) : (
                         <DynamicInput
                             props={{
                                 entityCreationsState,
                                 entity: entity,
-                                parentRef: parentRef
+                                parentRef: parentRef,
+                                setEntityCreationsState
                             }}
                         />
                     )}
+
                 </div>
             )}
         </li>
