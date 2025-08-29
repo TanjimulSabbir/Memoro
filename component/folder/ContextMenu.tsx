@@ -1,5 +1,6 @@
 import { db, File, Folder } from '@/db/db';
 import { EntityCreationStateProps, EntityCreationType, RightMenuClick } from '@/types/types';
+import { DeleteConfirmationButton } from '@/utils/ConfirmationButton';
 import { EntityDelete } from '@/utils/EntityDelete';
 import {
     Download,
@@ -21,7 +22,9 @@ interface ContextMenuProps {
 
 export default function ContextMenu({ entityCreationsState, setEntityCreationsState }: ContextMenuProps) {
     const { contextMenu } = entityCreationsState || {};
-    if (!contextMenu?.entity) return;
+    const [deleteEntity, setDeleteEntity] = React.useState<any | null>(null);
+
+    if (!contextMenu?.entity) return null;
 
     const handleMenuClick = (menuType: RightMenuClick, entityCreationType?: EntityCreationType) => {
         switch (menuType) {
@@ -39,7 +42,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
 
             case "DELETE":
                 if (contextMenu.entity) {
-                    return EntityDelete(contextMenu.entity);
+                    setDeleteEntity(contextMenu.entity);
                 }
                 break;
             case "RENAME":
@@ -151,6 +154,13 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                     <Info className="w-4 h-4" /> Properties
                 </li>
             </ul>
+            {deleteEntity && (
+                <DeleteConfirmationButton
+                    entity={deleteEntity}
+                    onClose={() => setDeleteEntity(null)}
+                />
+            )}
+
         </div>
     )
 }
