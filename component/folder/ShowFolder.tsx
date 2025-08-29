@@ -10,13 +10,13 @@ import ContextMenuComponent from "./ContextMenu";
 import EntityCreatingInput from "./EntityCreatingInput";
 
 interface ShowFolderProps {
-  entityCreationsState: EntityCreationStateProps|null;
-  setEntityCreationsState: (value: EntityCreationStateProps|null) => void;
+  entityCreationsState: EntityCreationStateProps | null;
+  setEntityCreationsState: (value: EntityCreationStateProps | null) => void;
   handleSearchTextChange: (value: string) => void;
   data: any[];
 };
 export default function ShowFolder({ props }: { props: ShowFolderProps }) {
-  const { entityCreationsState, setEntityCreationsState, handleSearchTextChange, data } = props;
+  const { entityCreationsState, setEntityCreationsState, data } = props;
   const [note] = useState(""); // still state but not tied to keystrokes
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
 

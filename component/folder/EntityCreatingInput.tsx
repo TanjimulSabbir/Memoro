@@ -42,22 +42,30 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
         let childrenLevel = false;
 
         const targetName = normalize(inputText);
-        const parentLevelCheck = allFlatData.find(item => item.parentId === entity?.parentId); // Check if parentId exists
-        if (parentLevelCheck) {
+        let parentLevelCheck;
+
+        if (entity?.parentId === null) {
+            parentLevelCheck = allFlatData.filter(item => item.parentId === null); // top level entities
+            parentLevel = parentLevelCheck.some(item => normalize(getEntityName(item)) === targetName);
+        } else if (entity?.parentId) {
+            parentLevelCheck = allFlatData.find(item => item.parentId === entity?.parentId); //
+        }
+
+        if (parentLevelCheck && entity?.parentId) {
             console.log(parentLevelCheck, "parent level check");
             parentLevel = normalize(getEntityName(parentLevelCheck)) === targetName;
         }
 
         const siblings = allFlatData.filter((e) => e.id === entity?.parentId);
-        if (siblings.length) {
+        if (siblings?.length) {
             console.log("Sibling level check:", siblings);
             siblingsLevel = siblings.some(
                 (e) => normalize(getEntityName(e)) === targetName && e.id !== entity?.id
             );
         }
 
-        const childLevelCheck = entity.children;
-        if (childLevelCheck.length) {
+        const childLevelCheck = entity?.children;
+        if (childLevelCheck?.length) {
             console.log("Child level check:", childLevelCheck);
             childrenLevel = childLevelCheck.some(item => normalize(getEntityName(item)) === targetName);
         }
@@ -105,7 +113,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
     return (
         <div
             ref={wrapperRef}
-            className={`${rightMenuClick === "CREATE" ? "mt-3 ml-2" : ""} relative flex items-center space-x-1 font-Domine`}
+            className={`${rightMenuClick === "CREATE" ? "my-2" : ""} relative flex items-center space-x-1 font-Domine`}
         >
             <p className="absolute top-1.5 left-0">
                 {entityCreationType === "FOLDER" ? (
@@ -131,7 +139,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
                         }`}
                 />
                 {error && (
-                    <small className="text-[10px] font-light text-red-500 mt-1 block">
+                    <small className="text-[10px] font-light font-PtSerif text-green-500 mt-1 block">
                         {error}
                     </small>
                 )}
