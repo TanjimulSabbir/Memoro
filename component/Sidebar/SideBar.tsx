@@ -74,6 +74,7 @@ export default function SideBar() {
     }, [searchText, entities]);
 
 
+    console.log(entityCreationsState, "entityCreationsState from sidebar");
 
     return (
         <div className="relative w-full max-w-[280px] border-r border-prime px-3 min-h-screen">

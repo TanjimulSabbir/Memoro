@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { handleCreateAndUpdateEntity } from "@/db/CreateEntity";
 import { useGetFlatAllEntities } from "@/db/useGetEntities";
-import { EntityCreationStateProps } from "@/types/types";
+import { ContextMenu, EntityCreationStateProps } from "@/types/types";
 import { FileText, FolderIcon } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -10,96 +10,87 @@ type DynamicInputProps = {
     entityCreationsState: EntityCreationStateProps | null;
     entity: any;
     parentRef?: React.RefObject<HTMLDivElement | null>;
-
+    setContextMenu: (value: ContextMenu | null) => void;
 };
 
 const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
-    const { entity, entityCreationsState, setEntityCreationsState, parentRef } = props;
-    const { entityCreationMethod, entityCreationType, rightMenuClick, contextMenu } = entityCreationsState || {};
+    const { entity, entityCreationsState, setEntityCreationsState, parentRef, setContextMenu } = props;
+    const { entityCreationType, rightMenuClick } = entityCreationsState || {};
+
     const [inputText, setInputText] = useState(
-        entity?.rightClickType === "RENAME"
-            ? entity?.folderName || entity?.fileName || ""
-            : ""
+        rightMenuClick == "RENAME" ? entity?.type === "FOLDER"
+            ? entity?.folderName : entity?.fileName : ""
     );
     const [error, setError] = useState("");
     const wrapperRef = useRef<HTMLDivElement>(null);
-    // const [allFlatData, setAllFlatData] = useState<any[]>([]);
     const allFlatData = useGetFlatAllEntities();
 
-    // put these tiny helpers at module scope if you like
     const normalize = (text?: string) => (text ?? "").trim().toLowerCase();
-    const getEntityName = (entity: any) => entity?.folderName ?? entity?.fileName ?? "";
+    const getEntityName = (entity: any) => entity?.folderName ?? entity?.fileName;
+
+    const resetEntityState = () => {
+        setInputText("");
+        setError("");
+        setContextMenu({ entity: null, x: 0, y: 0, visible: false });
+        setEntityCreationsState(null);
+    };
 
     const checkDuplicate = (): boolean => {
         if (!allFlatData || !inputText.trim()) return false;
-        console.log(allFlatData, "entities");
+        let parentLevel = false;
+        let siblingsLevel = false;
+        let childrenLevel = false;
 
-        const target = normalize(inputText);
-
-
-        // Check for duplicates in the root level
-        if (entity?.parentId === null) {
-            const nullEntities = allFlatData.filter((e) => e.parentId === null);
-            if (nullEntities.some((e) => normalize(getEntityName(e)) === target && e.id !== entity.id)) {
-                return true;
-            }
+        const targetName = normalize(inputText);
+        const parentLevelCheck = allFlatData.find(item => item.parentId === entity?.parentId); // Check if parentId exists
+        if (parentLevelCheck) {
+            console.log(parentLevelCheck, "parent level check");
+            parentLevel = normalize(getEntityName(parentLevelCheck)) === targetName;
         }
 
-        // 1) Parent name (parent is always a folder in typical trees)
-        if (entity?.parentId) {
-            const parent = allFlatData.find((e) => e.parentId === entity?.parentId);
-            if (parent && normalize(getEntityName(parent)) === target && parent.id !== entity?.parentId) {
-                return true;
-            }
+        const siblings = allFlatData.filter((e) => e.id === entity?.parentId);
+        if (siblings.length) {
+            console.log("Sibling level check:", siblings);
+            siblingsLevel = siblings.some(
+                (e) => normalize(getEntityName(e)) === targetName && e.id !== entity?.id
+            );
         }
 
-        // parent children (siblings)
-        if (entity?.parentId) {
-            const siblings = allFlatData.filter((e) => e.parentId === entity.parentId);
-            if (siblings && siblings.some((sibling: any) => normalize(getEntityName(sibling)) === target && sibling.id !== entity.id)) {
-                return true;
-            }
+        const childLevelCheck = entity.children;
+        if (childLevelCheck.length) {
+            console.log("Child level check:", childLevelCheck);
+            childrenLevel = childLevelCheck.some(item => normalize(getEntityName(item)) === targetName);
         }
-
-        // Entity's own Children
-        const children: any[] = allFlatData.filter((e) => e.parentId === entity?.id);
-        console.log(children, "children");
-
-        if (children.some((c) => normalize(getEntityName(c)) === target && c.id !== entity?.id)) {
-            return true;
-        }
-
-        return false;
+        return parentLevel || siblingsLevel || childrenLevel;
     };
-
 
     const handleSubmit = () => {
         const trimmed = inputText.trim();
-        if (!trimmed) return;
 
-        if (trimmed.length > 25) {
-            setError("Name must be between 1 and 20 characters");
+        if (!trimmed) return;
+        if (trimmed.length > 20) {
+            setError("Name must be 20 characters or less");
             return;
         }
 
         if (checkDuplicate()) {
-            setError(`${trimmed} with this name already exists in the hierarchy`);
+            setError(`"${trimmed}" already exists in this folder`);
             return;
         }
 
         setError("");
-        return handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState, trimmed);
+        handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState, trimmed);
     };
 
-    // ✅ Outside click: submit or cancel
+    // Handle outside click to cancel or submit
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node;
             if (wrapperRef.current?.contains(target)) return;
             if (parentRef?.current?.contains(target)) return;
 
-            if (!inputText.trim() || rightMenuClick === "RENAME") {
-                setEntityCreationsState({ entityName: "", entityCreationMethod: null, entityCreationType: null, entity: null, rightMenuClick: null, contextMenu: { entity: null, x: 0, y: 0, visible: false } });
+            if (rightMenuClick === "RENAME" || rightMenuClick === "CREATE") {
+                resetEntityState();
             } else {
                 handleSubmit();
             }
@@ -109,8 +100,13 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
         return () => window.removeEventListener("mousedown", handleClickOutside);
     }, [inputText, rightMenuClick]);
 
+    console.log(entityCreationsState, "entityCreationsState from EntityCreatingInput");
+
     return (
-        <div ref={wrapperRef} className={`${rightMenuClick == "CREATE" && "mt-3"} relative flex items-center space-x-1 font-Domine`}>
+        <div
+            ref={wrapperRef}
+            className={`${rightMenuClick === "CREATE" ? "mt-3 ml-2" : ""} relative flex items-center space-x-1 font-Domine`}
+        >
             <p className="absolute top-1.5 left-0">
                 {entityCreationType === "FOLDER" ? (
                     <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
@@ -120,16 +116,14 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
             </p>
             <div className="flex flex-col w-full pl-6">
                 <Input
-                    placeholder={
-                        entityCreationType === "FOLDER"
-                            ? "New folder name"
-                            : "New file name"
-                    }
+                    // defaultValue={entity.type === "FOLDER" ? entity?.folderName : entity?.fileName}
+                    placeholder={rightMenuClick === "CREATE" ? "New folder name" : "New file name"}
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
+
                     onKeyDown={(e) => {
-                        if (e.key === "Enter") return handleSubmit();
-                        if (e.key === "Escape") setEntityCreationsState({ entityName: "", entityCreationMethod: null, entityCreationType: null, entity: null, rightMenuClick: null, contextMenu: { entity: null, x: 0, y: 0, visible: false } });
+                        if (e.key === "Enter") handleSubmit();
+                        if (e.key === "Escape") resetEntityState();
                     }}
                     autoFocus
                     aria-invalid={!!error}

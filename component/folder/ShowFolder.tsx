@@ -52,7 +52,8 @@ export default function ShowFolder({ props }: { props: ShowFolderProps }) {
             props={{
               entityCreationsState,
               entity: { parentId: null, type: entityCreationsState.entityCreationType },
-              setEntityCreationsState
+              setEntityCreationsState,
+              setContextMenu
             }}
           />
         </div>
@@ -67,7 +68,8 @@ export default function ShowFolder({ props }: { props: ShowFolderProps }) {
                 entity,
                 entityCreationsState,
                 setEntityCreationsState,
-                handleOnMenuContext
+                handleOnMenuContext,
+                setContextMenu
               }}
             />
           ))

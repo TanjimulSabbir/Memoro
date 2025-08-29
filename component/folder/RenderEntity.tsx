@@ -1,6 +1,6 @@
 "use client";
 
-import { EntityCreationStateProps } from "@/types/types";
+import { ContextMenu, EntityCreationStateProps } from "@/types/types";
 import { FileText, FolderIcon, LucideChevronLeft } from "lucide-react";
 import React, { useRef, useState } from "react";
 import DynamicInput from "./EntityCreatingInput";
@@ -10,11 +10,12 @@ interface EntityRendererProps {
     entityCreationsState: EntityCreationStateProps | null;
     setEntityCreationsState: (value: EntityCreationStateProps | null) => void;
     handleOnMenuContext: (e: React.MouseEvent<HTMLDivElement>, entity: any) => void;
+    setContextMenu: (value: ContextMenu | null) => void;
 }
 
 export default function EntityRenderer({ props }: { props: EntityRendererProps }) {
-    const { entity, entityCreationsState, setEntityCreationsState, handleOnMenuContext } = props;
-    const { contextMenu, entityCreationMethod, entityCreationType, rightMenuClick } = entityCreationsState || {};
+    const { entity, entityCreationsState, setEntityCreationsState, handleOnMenuContext, setContextMenu } = props;
+    const { contextMenu, rightMenuClick } = entityCreationsState || {};
     // Track folder open/close state
     const [isOpen, setIsOpen] = useState(false);
     const toggleFolder = (e: React.MouseEvent) => {
@@ -22,7 +23,7 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
         setIsOpen(!isOpen);
     };
     const parentRef = useRef<HTMLDivElement>(null);
-    const inputOpen = ["CREATE", "RENAME"];
+    const clearContextMenu = () => setContextMenu({ entity: null, x: 0, y: 0, visible: false });
     return (
         <li className="flex flex-col gap-2 group mt-2 rounded group pr-1 py-0.5 hover:bg-muted/10 transition">
             {entity.type === "FOLDER" ? (
@@ -49,7 +50,8 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                                 entityCreationsState,
                                 entity: entity,
                                 parentRef: parentRef,
-                                setEntityCreationsState
+                                setEntityCreationsState,
+                                setContextMenu
                             }}
                         />}
                     {rightMenuClick === "CREATE" && entity.id === contextMenu?.entity?.id && <DynamicInput
@@ -57,7 +59,8 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                             entityCreationsState,
                             entity: entity,
                             parentRef: parentRef,
-                            setEntityCreationsState
+                            setEntityCreationsState,
+                            setContextMenu
                         }}
                     />}
 
@@ -71,7 +74,8 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                                         entity: child,
                                         entityCreationsState,
                                         setEntityCreationsState,
-                                        handleOnMenuContext
+                                        handleOnMenuContext,
+                                        setContextMenu
                                     }}
                                 />
                             ))}
@@ -98,7 +102,8 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                                 entityCreationsState,
                                 entity: entity,
                                 parentRef: parentRef,
-                                setEntityCreationsState
+                                setEntityCreationsState,
+                                setContextMenu
                             }}
                         />
                     )}
@@ -107,7 +112,8 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                             entityCreationsState,
                             entity: entity,
                             parentRef: parentRef,
-                            setEntityCreationsState
+                            setEntityCreationsState,
+                            setContextMenu
                         }}
                     />}
                 </div>

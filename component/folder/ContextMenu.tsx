@@ -32,7 +32,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                         entityCreationMethod: "RIGHTCLICK",
                         entityCreationType: entityCreationType ?? (contextMenu.entity?.type),
                         entity: contextMenu.entity,
-                        rightMenuClick: menuType,
+                        rightMenuClick: "CREATE",
                     });
                 }
                 break;
@@ -51,7 +51,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                         entityCreationMethod: "RIGHTCLICK",
                         entityCreationType: entityCreationType ?? (contextMenu.entity?.type),
                         entity: contextMenu.entity,
-                        rightMenuClick: menuType,
+                        rightMenuClick: "RENAME",
                     });
                 }
                 break;
