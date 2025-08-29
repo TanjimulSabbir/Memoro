@@ -1,7 +1,5 @@
-import { db, File, Folder } from '@/db/db';
 import { EntityCreationStateProps, EntityCreationType, RightMenuClick } from '@/types/types';
 import { DeleteConfirmationButton } from '@/utils/ConfirmationButton';
-import { EntityDelete } from '@/utils/EntityDelete';
 import {
     Download,
     FilePlus,
@@ -42,7 +40,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
 
             case "DELETE":
                 if (contextMenu.entity) {
-                    setDeleteEntity(contextMenu.entity);
+                    return setDeleteEntity(contextMenu.entity);
                 }
                 break;
             case "RENAME":
@@ -75,6 +73,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                 break;
         }
     }
+
 
     return (
         <div
@@ -130,6 +129,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                     onClick={() => handleMenuClick("RENAME")}
                 >
                     <Pencil className="w-4 h-4" /> Rename
+
                 </li>
                 <li
                     className="px-4 py-2 flex items-center gap-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer transition-all duration-150"
@@ -137,6 +137,7 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                 >
                     <Trash2 className="w-4 h-4" /> Delete
                 </li>
+
 
                 <hr className="my-2 border-gray-200 dark:border-neutral-700" />
 
@@ -155,12 +156,10 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                 </li>
             </ul>
             {deleteEntity && (
-                <DeleteConfirmationButton
-                    entity={deleteEntity}
-                    onClose={() => setDeleteEntity(null)}
-                />
+                <p className='absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center'>
+                    Are you sure you want to delete this entity?
+                </p>
             )}
-
         </div>
     )
 }

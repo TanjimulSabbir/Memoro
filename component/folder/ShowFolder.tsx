@@ -1,13 +1,14 @@
 "use client";
 
 import { File, Folder } from "@/db/db";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import DynamicInput from "./EntityCreatingInput";
 import EntityRenderer from "./RenderEntity";
 import { ContextMenu, EntityCreationStateProps } from "@/types/types";
 import ContextMenuComponent from "./ContextMenu";
 import EntityCreatingInput from "./EntityCreatingInput";
+import { DeleteConfirmationButton } from "@/utils/ConfirmationButton";
 
 interface ShowFolderProps {
   entityCreationsState: EntityCreationStateProps | null;
@@ -41,7 +42,6 @@ export default function ShowFolder({ props }: { props: ShowFolderProps }) {
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
-
 
   return (
     <>
@@ -84,6 +84,7 @@ export default function ShowFolder({ props }: { props: ShowFolderProps }) {
           setEntityCreationsState={setEntityCreationsState}
         />
       )}
+ 
     </>
   );
 }

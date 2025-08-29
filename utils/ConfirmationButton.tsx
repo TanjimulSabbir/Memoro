@@ -9,6 +9,7 @@ interface DeleteConfirmationButtonProps {
 }
 
 export function DeleteConfirmationButton({ entity, onClose }: DeleteConfirmationButtonProps) {
+    
     const handleDelete = async () => {
         try {
             await deleteEntityRecursive(entity);
@@ -22,22 +23,25 @@ export function DeleteConfirmationButton({ entity, onClose }: DeleteConfirmation
     console.log(entity,"from DeleteConfirmationButton");
 
     return (
-        <AlertDialog open={true} onOpenChange={onClose}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This will permanently delete "{'fileName' in entity ? entity.fileName : entity.folderName}"
-                        {entity.type === "FOLDER" && entity?.children?.length
-                            ? ` and its ${entity?.children.length} children`
-                            : ""}.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <div>
+            <AlertDialog open={true} onOpenChange={onClose}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will permanently delete "{'fileName' in entity ? entity?.fileName :
+                                entity?.folderName}"
+                            {entity.type === "FOLDER" && entity?.children?.length
+                                ? ` and its ${entity?.children.length} children`
+                                : ""}.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+     </div>
     );
 }
