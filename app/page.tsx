@@ -11,8 +11,9 @@ export default function Home() {
       <div className="container max-w-screen-2xl mx-auto flex gap-x-10">
         <SideBar />
         <TextBody />
+        <Toaster position="top-center" expand={true} richColors />
       </div>
-      <Toaster position="top-center" expand={true} richColors />
+    
     </div>
   );
 }

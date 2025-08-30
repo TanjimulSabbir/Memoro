@@ -1,14 +1,12 @@
 "use client";
 
 import { File, Folder } from "@/db/db";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import DynamicInput from "./EntityCreatingInput";
-import EntityRenderer from "./RenderEntity";
 import { ContextMenu, EntityCreationStateProps } from "@/types/types";
 import ContextMenuComponent from "./ContextMenu";
 import EntityCreatingInput from "./EntityCreatingInput";
-import { DeleteConfirmationButton } from "@/utils/ConfirmationButton";
+import EntityRenderer from "./RenderEntity";
 
 interface ShowFolderProps {
   entityCreationsState: EntityCreationStateProps | null;
