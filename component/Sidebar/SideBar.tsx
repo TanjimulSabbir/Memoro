@@ -1,56 +1,16 @@
 "use client";
+import { useGetEntities } from "@/db/useGetEntities";
+import { useCallback, useEffect, useState } from "react";
+import ShowFolder from "../Folder/ShowFolder";
 import TopBox from "./TopBox";
-import ShowFolder from "../folder/ShowFolder";
-import { useState, useCallback, useEffect } from "react";
-import { db } from "@/db/db";
-import { useLiveQuery } from "dexie-react-hooks";
+import { EntityCreationStateProps } from "@/types/types";
 
 export default function SideBar() {
     // ✅ live query all entities as a nested tree
-    const entities = useLiveQuery(async () => {
-        const [folders, files] = await Promise.all([db.folders.toArray(), db.files.toArray()]);
-        const allEntities = [...folders, ...files];
-
-        const map = new Map<string, any>();
-        allEntities.forEach((entity) => map.set(entity.id, { ...entity, children: [] }));
-
-        const roots: any[] = [];
-        allEntities.forEach((entity) => {
-            const node = map.get(entity.id);
-            if (entity.parentId) {
-                const parent = map.get(entity.parentId);
-                if (parent) parent.children.push(node);
-                else roots.push(node);
-            } else {
-                roots.push(node);
-            }
-        });
-
-        const sortChildren = (nodes: any[]) => {
-            nodes.sort((a, b) => b.createdAt - a.createdAt);
-            nodes.forEach((n) => n.children.length && sortChildren(n.children));
-        };
-        sortChildren(roots);
-
-        return roots;
-    }, [], []);
-
-    const [createEntityType, setCreateEntityType] = useState<{
-        createBy: "button" | null;
-        type: "file" | "folder";
-        parentId?: string | null;
-    }>({ createBy: null, type: "folder", parentId: null });
-
+    const entities = useGetEntities();
+    const [entityCreationsState, setEntityCreationsState] = useState<EntityCreationStateProps | null>(null);
     const [searchText, setSearchText] = useState<string>("");
     const [results, setResults] = useState<any[]>([]);
-
-    // ✅ update create entity type
-    const handleCreateEntityTypeChange = useCallback(
-        (createBy: "button" | null, type: "file" | "folder", parentId?: string | null) => {
-            setCreateEntityType({ createBy, type, parentId });
-        },
-        []
-    );
 
     // ✅ debounce
     const debounce = (fn: (...args: any[]) => void, delay: number) => {
@@ -76,7 +36,6 @@ export default function SideBar() {
             setResults([]);
             return;
         }
-
         // recursive search including all children of a matched folder
         const searchTree = (nodes: any[]): any[] => {
             const res: any[] = [];
@@ -115,18 +74,25 @@ export default function SideBar() {
     }, [searchText, entities]);
 
 
+    console.log(entityCreationsState, "entityCreationsState from sidebar");
+
     return (
-        <div className="relative w-full max-w-[280px] border-r border-gray-300 px-3 min-h-screen">
+        <div className="relative w-full max-w-[280px] border-r border-prime px-3 min-h-screen">
             <TopBox
-                createEntityType={createEntityType}
-                handleCreateEntityTypeChange={handleCreateEntityTypeChange}
-                handleSearchTextChange={handleSearchTextChange}
+                props={{
+                    entityCreationsState,
+                    setEntityCreationsState,
+                    handleSearchTextChange
+                }}
             />
 
             <ShowFolder
-                createEntityType={createEntityType}
-                handleCreateEntityTypeChange={handleCreateEntityTypeChange}
-                data={results.length ? results : entities} // show filtered or full tree
+                props={{
+                    entityCreationsState,
+                    setEntityCreationsState,
+                    handleSearchTextChange,
+                    data: results.length ? results : entities
+                }}
             />
         </div>
     );

@@ -1,62 +1,151 @@
-import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { handleCreateAndUpdateEntity } from "@/db/CreateEntity";
+import { useGetFlatAllEntities } from "@/db/useGetEntities";
+import { ContextMenu, EntityCreationStateProps } from "@/types/types";
+import { FileText, FolderIcon } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 
 type DynamicInputProps = {
-    placeholder?: string;
-    defaultValue?: string;
-    entityType: "folder" | "file";
-    onSubmit: (value: string, type: "folder" | "file") => void;
-    onCancel?: (type: "folder" | "file") => void;
+    setEntityCreationsState: (value: EntityCreationStateProps | null) => void;
+    entityCreationsState: EntityCreationStateProps | null;
+    entity: any;
+    parentRef?: React.RefObject<HTMLDivElement | null>;
+    setContextMenu: (value: ContextMenu | null) => void;
 };
 
-const DynamicInput: React.FC<DynamicInputProps> = ({
-    placeholder,
-    defaultValue = "",
-    entityType,
-    onSubmit,
-    onCancel,
-}) => {
-    const [inputText, setInputText] = useState<string>(defaultValue);
-    const wrapperRef = useRef<HTMLDivElement>(null);
+const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
+    const { entity, entityCreationsState, setEntityCreationsState, parentRef, setContextMenu } = props;
+    const { entityCreationType, rightMenuClick } = entityCreationsState || {};
 
-    // while user creating entity is ended (outside of input click, enter and onBlur)
+    const [inputText, setInputText] = useState(
+        rightMenuClick == "RENAME" ? entity?.type === "FOLDER"
+            ? entity?.folderName : entity?.fileName : ""
+    );
+    const [error, setError] = useState("");
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const allFlatData = useGetFlatAllEntities();
+
+    const normalize = (text?: string) => (text ?? "").trim().toLowerCase();
+    const getEntityName = (entity: any) => entity?.folderName ?? entity?.fileName;
+
+    const resetEntityState = () => {
+        setInputText("");
+        setError("");
+        setContextMenu({ entity: null, x: 0, y: 0, visible: false });
+        setEntityCreationsState(null);
+    };
+
+    const checkDuplicate = (): boolean => {
+        if (!allFlatData || !inputText.trim()) return false;
+        let parentLevel = false;
+        let siblingsLevel = false;
+        let childrenLevel = false;
+
+        const targetName = normalize(inputText);
+        let parentLevelCheck;
+
+        if (entity?.parentId === null) {
+            parentLevelCheck = allFlatData.filter(item => item.parentId === null); // top level entities
+            parentLevel = parentLevelCheck.some(item => normalize(getEntityName(item)) === targetName);
+        } else if (entity?.parentId) {
+            parentLevelCheck = allFlatData.find(item => item.parentId === entity?.parentId); //
+        }
+
+        if (parentLevelCheck && entity?.parentId) {
+            console.log(parentLevelCheck, "parent level check");
+            parentLevel = normalize(getEntityName(parentLevelCheck)) === targetName;
+        }
+
+        const siblings = allFlatData.filter((e) => e.id === entity?.parentId);
+        if (siblings?.length) {
+            console.log("Sibling level check:", siblings);
+            siblingsLevel = siblings.some(
+                (e) => normalize(getEntityName(e)) === targetName && e.id !== entity?.id
+            );
+        }
+
+        const childLevelCheck = entity?.children;
+        if (childLevelCheck?.length) {
+            console.log("Child level check:", childLevelCheck);
+            childrenLevel = childLevelCheck.some(item => normalize(getEntityName(item)) === targetName);
+        }
+        return parentLevel || siblingsLevel || childrenLevel;
+    };
+
+    const handleSubmit = () => {
+        const trimmed = inputText.trim();
+
+        if (!trimmed) return;
+        if (trimmed.length > 20) {
+            setError("Name must be 20 characters or less");
+            return;
+        }
+
+        if (checkDuplicate()) {
+            setError(`"${trimmed}" already exists in this folder`);
+            return;
+        }
+
+        setError("");
+        handleCreateAndUpdateEntity(entityCreationsState, setEntityCreationsState, trimmed);
+    };
+
+    // Handle outside click to cancel or submit
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-                if (inputText.trim()) {
-                    // If input has value, submit it
-                    onSubmit(inputText, entityType);
-                } else {
-                    // If input empty, just cancel
-                    onCancel?.(entityType);
-                }
+            const target = event.target as Node;
+            if (wrapperRef.current?.contains(target)) return;
+            if (parentRef?.current?.contains(target)) return;
+
+            if (rightMenuClick === "RENAME" || rightMenuClick === "CREATE") {
+                resetEntityState();
+            } else {
+                handleSubmit();
             }
         };
 
         window.addEventListener("mousedown", handleClickOutside);
         return () => window.removeEventListener("mousedown", handleClickOutside);
-    }, [entityType, onSubmit, onCancel]);
+    }, [inputText, rightMenuClick]);
+
+    console.log(entityCreationsState, "entityCreationsState from EntityCreatingInput");
 
     return (
-        <div ref={wrapperRef} className="font-Domine">
-            <Input
-                defaultValue={defaultValue}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyDown={(e) => {
-                    if (e.key === "Enter" && inputText.trim()) {
-                        onSubmit(inputText, entityType);
-                    }
-                    if (e.key === "Escape") {
-                        onCancel?.(entityType);
-                    }
-                }}
-                autoFocus
-                placeholder={placeholder || (entityType === "folder" ? "New folder name" : "New file name")}
-                className="mt-3 w-full text-sm px-2 py-1 h-auto bg-transparent focus:ring-0 border-none placeholder:text-xs"
-            />
-            {inputText.length > 25 && <small className="text-[8px] font-light text-red-500 text-justify ml-1 -mt-2">Name must be between 1 and 20 characters</small>}
+        <div
+            ref={wrapperRef}
+            className={`${rightMenuClick === "CREATE" ? "my-2" : ""} relative flex items-center space-x-1 font-Domine`}
+        >
+            <p className="absolute top-1.5 left-0">
+                {entityCreationType === "FOLDER" ? (
+                    <FolderIcon className="w-4 h-4 text-prime" strokeWidth={1.5} />
+                ) : (
+                    <FileText className="w-4 h-4 text-sky-500" strokeWidth={1.5} />
+                )}
+            </p>
+            <div className="flex flex-col w-full pl-6">
+                <Input
+                    // defaultValue={entity.type === "FOLDER" ? entity?.folderName : entity?.fileName}
+                    placeholder={rightMenuClick === "CREATE" ? "New folder name" : "New file name"}
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSubmit();
+                        if (e.key === "Escape") resetEntityState();
+                    }}
+                    autoFocus
+                    aria-invalid={!!error}
+                    className={`w-full text-xs py-1 h-auto border-none placeholder:text-xs outline-none focus:ring-1 focus:ring-blue-500 ${error ? "text-red-500" : ""
+                        }`}
+                />
+                {error && (
+                    <small className="text-[10px] font-light font-PtSerif text-green-500 mt-1 block">
+                        {error}
+                    </small>
+                )}
+            </div>
         </div>
     );
 };
 
-export default DynamicInput;
+export default EntityCreatingInput;

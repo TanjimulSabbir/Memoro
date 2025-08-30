@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 export default function Home() {
   return (
-    <div className="">
+    <div>
       <Header />
       <div className="container max-w-screen-2xl mx-auto flex gap-x-10">
         <SideBar />

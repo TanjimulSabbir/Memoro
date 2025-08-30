@@ -1,5 +1,5 @@
-import { db, File, Folder } from '@/db/db';
-import { EntityDelete } from '@/utils/EntityDelete';
+import { EntityCreationStateProps, EntityCreationType, RightMenuClick } from '@/types/types';
+import { DeleteConfirmationButton } from '@/utils/ConfirmationButton';
 import {
     Download,
     FilePlus,
@@ -13,20 +13,48 @@ import {
 } from "lucide-react";
 import React from 'react';
 
-export default function ContextMenu({ contextMenu, handleCreateEntityByRightClick }: { contextMenu: { entity: Folder | File | null; x: number; y: number; visible: boolean }; setContextMenu: React.Dispatch<React.SetStateAction<{ entity: Folder | File | null; x: number; y: number; visible: boolean }>>; handleCreateEntityByRightClick: (selectMenuTpye: "folder" | "file") => void; }) {
-    console.log(contextMenu, "contextMenu");
+interface ContextMenuProps {
+    entityCreationsState: EntityCreationStateProps | null;
+    setEntityCreationsState: (value: EntityCreationStateProps) => void;
+}
 
-    type menuClickType = "DELETE" | "RENAME" | "SHARE" | "OPEN" | "DOWNLOAD" | "SETTINGS" | "PROPERTIES"
+export default function ContextMenu({ entityCreationsState, setEntityCreationsState }: ContextMenuProps) {
+    const { contextMenu } = entityCreationsState || {};
+    const [deleteEntity, setDeleteEntity] = React.useState<any | null>(null);
 
-    const handleMenuClick = async (menuType: menuClickType) => {
+    if (!contextMenu?.entity) return null;
+
+    const handleMenuClick = (menuType: RightMenuClick, entityCreationType?: EntityCreationType) => {
         switch (menuType) {
+            case "CREATE":
+                if (contextMenu?.entity) {
+                    setEntityCreationsState({
+                        ...entityCreationsState!,
+                        entityCreationMethod: "RIGHTCLICK",
+                        entityCreationType: entityCreationType ?? (contextMenu.entity?.type),
+                        entity: contextMenu.entity,
+                        rightMenuClick: "CREATE",
+                    });
+                }
+                break;
+
             case "DELETE":
                 if (contextMenu.entity) {
-                    await EntityDelete(contextMenu.entity);
+                    return setDeleteEntity(contextMenu.entity);
                 }
                 break;
             case "RENAME":
-                console.log("Rename");
+                console.log(contextMenu.entity, "contextMenu");
+                if (contextMenu.entity?.type) {
+                    console.log("Renaming", contextMenu.entity.type);
+                    setEntityCreationsState({
+                        ...entityCreationsState!,
+                        entityCreationMethod: "RIGHTCLICK",
+                        entityCreationType: entityCreationType ?? (contextMenu.entity?.type),
+                        entity: contextMenu.entity,
+                        rightMenuClick: "RENAME",
+                    });
+                }
                 break;
             case "SHARE":
                 console.log("Share");
@@ -46,6 +74,7 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
         }
     }
 
+
     return (
         <div
             className="absolute z-50"
@@ -54,17 +83,17 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
             <ul className="w-60 bg-white dark:bg-neutral-900 dark:text-neutral-200 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-2 animate-fadeIn z">
 
                 {/* Create New */}
-                {contextMenu.entity?.type === "folder" && (
+                {contextMenu?.entity?.type === "FOLDER" && (
                     <>
                         <li
                             className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white cursor-pointer transition-all duration-200"
-                            onClick={() => handleCreateEntityByRightClick("folder")}
+                            onClick={() => handleMenuClick("CREATE", "FOLDER")}
                         >
                             <FolderPlus className="w-4 h-4" /> New Folder
                         </li>
                         <li
                             className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gradient-to-r hover:from-indigo-500 hover:to-purple-500 hover:text-white cursor-pointer transition-all duration-200"
-                            onClick={() => handleCreateEntityByRightClick("file")}
+                            onClick={() => handleMenuClick("CREATE", "FILE")}
                         >
                             <FilePlus className="w-4 h-4" /> New File
                         </li>
@@ -97,9 +126,10 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
                 {/* Edit */}
                 <li
                     className="px-4 py-2 flex items-center gap-3 text-sm text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-neutral-800 cursor-pointer transition-all duration-150"
-                    onClick={() => console.log("Rename")}
+                    onClick={() => handleMenuClick("RENAME")}
                 >
                     <Pencil className="w-4 h-4" /> Rename
+
                 </li>
                 <li
                     className="px-4 py-2 flex items-center gap-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer transition-all duration-150"
@@ -107,6 +137,7 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
                 >
                     <Trash2 className="w-4 h-4" /> Delete
                 </li>
+
 
                 <hr className="my-2 border-gray-200 dark:border-neutral-700" />
 
@@ -124,6 +155,11 @@ export default function ContextMenu({ contextMenu, handleCreateEntityByRightClic
                     <Info className="w-4 h-4" /> Properties
                 </li>
             </ul>
+            {deleteEntity && (
+                <p className='absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center'>
+                    Are you sure you want to delete this entity?
+                </p>
+            )}
         </div>
     )
 }

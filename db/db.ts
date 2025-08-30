@@ -6,7 +6,7 @@ export interface Folder {
   folderName: string;
   createdAt: number;
   updatedAt: number;
-  type: "folder";
+  type: "FOLDER";
 }
 export interface File {
   id: string;
@@ -15,12 +15,12 @@ export interface File {
   note: string;
   createdAt: number;
   updatedAt: number;
-  type: "file";
+  type: "FILE";
 }
 
 export class MemoroDatabase extends Dexie {
-  folders!: Table<Folder, number>;
-  files!: Table<File, number>;
+  folders!: Table<Folder, string>;
+  files!: Table<File, string>;
 
   constructor() {
     super("MemoroDatabase");
