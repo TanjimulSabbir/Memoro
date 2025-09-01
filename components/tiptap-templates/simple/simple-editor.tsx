@@ -74,6 +74,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
+import { Edit2 } from "lucide-react"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -242,6 +243,7 @@ export function SimpleEditor() {
       setMobileView("main")
     }
   }, [isMobile, mobileView])
+  const [noteTitle, setNoteTitle] = React.useState("");
 
   return (
     <div className="simple-editor-wrapper">
@@ -251,8 +253,8 @@ export function SimpleEditor() {
           style={{
             ...(isMobile
               ? {
-                  bottom: `calc(100% - ${height - rect.y}px)`,
-                }
+                bottom: `calc(100% - ${height - rect.y}px)`,
+              }
               : {}),
           }}
         >
@@ -269,7 +271,24 @@ export function SimpleEditor() {
             />
           )}
         </Toolbar>
+        {/* --- Note Title Input --- */}
+        <div className="flex flex-col mt-3 px-10">
 
+          {/* --- Note Title Input --- */}
+          <div className="relative w-full">
+            <Edit2 className="absolute left-3 top-7 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+            <input
+              type="text"
+              value={noteTitle}
+              onChange={(e) => setNoteTitle(e.target.value)}
+              placeholder="Enter your note title..."
+              className="w-full pl-10 pr-4 py-2.5 text-lg font-semibold text-gray-900 dark:text-gray-100 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
+            />
+            <p className="mt-1 ml-3 text-sm text-gray-500 dark:text-gray-400">
+              Give your note a descriptive title so you can find it easily later.
+            </p>
+          </div>
+          </div>
         <EditorContent
           editor={editor}
           role="presentation"
