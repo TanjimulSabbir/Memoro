@@ -1,18 +1,18 @@
 "use client"
 
-import * as React from "react"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import * as React from "react"
 
 // --- Tiptap Core Extensions ---
-import { StarterKit } from "@tiptap/starter-kit"
+import { Highlight } from "@tiptap/extension-highlight"
 import { Image } from "@tiptap/extension-image"
 import { TaskItem, TaskList } from "@tiptap/extension-list"
-import { TextAlign } from "@tiptap/extension-text-align"
-import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
+import { TextAlign } from "@tiptap/extension-text-align"
+import { Typography } from "@tiptap/extension-typography"
 import { Selection } from "@tiptap/extensions"
+import { StarterKit } from "@tiptap/starter-kit"
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button"
@@ -24,32 +24,32 @@ import {
 } from "@/components/tiptap-ui-primitive/toolbar"
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension"
-import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
 import "@/components/tiptap-node/blockquote-node/blockquote-node.scss"
 import "@/components/tiptap-node/code-block-node/code-block-node.scss"
-import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
-import "@/components/tiptap-node/list-node/list-node.scss"
-import "@/components/tiptap-node/image-node/image-node.scss"
 import "@/components/tiptap-node/heading-node/heading-node.scss"
+import { HorizontalRule } from "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node-extension"
+import "@/components/tiptap-node/horizontal-rule-node/horizontal-rule-node.scss"
+import "@/components/tiptap-node/image-node/image-node.scss"
+import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension"
+import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
-import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
-import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button"
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
 import {
   ColorHighlightPopover,
-  ColorHighlightPopoverContent,
   ColorHighlightPopoverButton,
+  ColorHighlightPopoverContent,
 } from "@/components/tiptap-ui/color-highlight-popover"
+import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
+import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
 import {
-  LinkPopover,
-  LinkContent,
   LinkButton,
+  LinkContent,
+  LinkPopover,
 } from "@/components/tiptap-ui/link-popover"
+import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { MarkButton } from "@/components/tiptap-ui/mark-button"
 import { TextAlignButton } from "@/components/tiptap-ui/text-align-button"
 import { UndoRedoButton } from "@/components/tiptap-ui/undo-redo-button"
@@ -60,9 +60,9 @@ import { HighlighterIcon } from "@/components/tiptap-icons/highlighter-icon"
 import { LinkIcon } from "@/components/tiptap-icons/link-icon"
 
 // --- Hooks ---
+import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useWindowSize } from "@/hooks/use-window-size"
-import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 
 // --- Components ---
 import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
@@ -72,9 +72,6 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
-
-import content from "@/components/tiptap-templates/simple/data/content.json"
-import { Edit2 } from "lucide-react"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -190,7 +187,9 @@ export function SimpleEditor() {
   const [mobileView, setMobileView] = React.useState<
     "main" | "highlighter" | "link"
   >("main")
-  const toolbarRef = React.useRef<HTMLDivElement>(null)
+  const toolbarRef = React.useRef<HTMLDivElement>(null);
+  const contentRef=React.useRef<HTMLTextAreaElement>(null)
+  const content = "dfj"
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -230,7 +229,7 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+   content: contentRef.current?.value ?? "",
   })
 
   const rect = useCursorVisibility({
@@ -243,7 +242,6 @@ export function SimpleEditor() {
       setMobileView("main")
     }
   }, [isMobile, mobileView])
-  const [noteTitle, setNoteTitle] = React.useState("");
 
   return (
     <div className="simple-editor-wrapper">
@@ -271,24 +269,7 @@ export function SimpleEditor() {
             />
           )}
         </Toolbar>
-        {/* --- Note Title Input --- */}
-        <div className="flex flex-col mt-3 px-10">
 
-          {/* --- Note Title Input --- */}
-          <div className="relative w-full">
-            <Edit2 className="absolute left-3 top-7 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-            <input
-              type="text"
-              value={noteTitle}
-              onChange={(e) => setNoteTitle(e.target.value)}
-              placeholder="Enter your note title..."
-              className="w-full pl-10 pr-4 py-2.5 text-lg font-semibold text-gray-900 dark:text-gray-100 bg-white dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded-lg focus:outline-none focus:ring-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
-            />
-            <p className="mt-1 ml-3 text-sm text-gray-500 dark:text-gray-400">
-              Give your note a descriptive title so you can find it easily later.
-            </p>
-          </div>
-          </div>
         <EditorContent
           editor={editor}
           role="presentation"
