@@ -188,8 +188,7 @@ export function SimpleEditor() {
     "main" | "highlighter" | "link"
   >("main")
   const toolbarRef = React.useRef<HTMLDivElement>(null);
-  const contentRef=React.useRef<HTMLTextAreaElement>(null)
-  const content = "dfj"
+  const contentRef = React.useRef<HTMLTextAreaElement>(null) 
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -229,7 +228,7 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-   content: contentRef.current?.value ?? "",
+    content: contentRef.current?.value ?? "",
   })
 
   const rect = useCursorVisibility({
@@ -243,6 +242,11 @@ export function SimpleEditor() {
     }
   }, [isMobile, mobileView])
 
+  const saveNote = async () => {
+    const content = editor?.getHTML() || ""
+    console.log(content, content);
+
+  }
   return (
     <div className="simple-editor-wrapper">
       <EditorContext.Provider value={{ editor }}>
@@ -269,12 +273,20 @@ export function SimpleEditor() {
             />
           )}
         </Toolbar>
-
+        <div className="flex items-center justify-end pb-3">
+          <Button
+            onClick={saveNote}
+            className="mt-4 px-4 py-2 bg-blue-500 cursor-pointer text-white rounded"
+          >
+            Save Note
+          </Button>
+      </div>
         <EditorContent
           editor={editor}
           role="presentation"
           className="simple-editor-content"
         />
+    
       </EditorContext.Provider>
     </div>
   )
