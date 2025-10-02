@@ -10,19 +10,50 @@ interface TopBoxProps {
 
 export default function TopBox({ props }: { props: TopBoxProps }) {
     const { entityCreationsState, setEntityCreationsState, handleSearchTextChange } = props;
+    
+    const handleCreateClick = (type: EntityCreationType) => {
+        if (entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === type) {
+            // If clicking the same button, cancel the creation
+            setEntityCreationsState(null);
+        } else {
+            // Otherwise, set the creation state
+            setEntityCreationsState({ 
+                entityCreationMethod: "BUTTON", 
+                entityCreationType: type
+            });
+        }
+    };
+
     return (
         <div className='mb-7 pt-4 flex items-center gap-3'>
             <div className='flex items-center gap-3'>
-                <FolderPlus className={`cursor-pointer text-prime ${entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FOLDER" ? "text-sky-500" : ""}`}
-                    onClick={() => setEntityCreationsState({ entityCreationMethod: "BUTTON", entityCreationType: "FOLDER" })} />
-                <Folder className={`cursor-pointer text-prime ${entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FILE" ? "text-sky-500" : ""}`}
-                    onClick={() => setEntityCreationsState({ entityCreationMethod: "BUTTON", entityCreationType: "FILE" })} />
+                <FolderPlus 
+                    className={`cursor-pointer transition-colors ${
+                        entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FOLDER" 
+                            ? "text-sky-500" 
+                            : "text-prime dark:text-gray-300 hover:text-sky-500"
+                    }`}
+                    onClick={() => handleCreateClick("FOLDER")} 
+                />
+                <Folder 
+                    className={`cursor-pointer transition-colors ${
+                        entityCreationsState?.entityCreationMethod === "BUTTON" && entityCreationsState?.entityCreationType === "FILE" 
+                            ? "text-sky-500" 
+                            : "text-prime dark:text-gray-300 hover:text-sky-500"
+                    }`}
+                    onClick={() => handleCreateClick("FILE")} 
+                />
             </div>
             <div className='flex items-center'>
-                <input onChange={(e) => handleSearchTextChange(e.target.value)} type="text" className='max-w-[160px] rounded-md outline-0 border text-sm border-prime pl-2 py-0.5 pr-7 placeholder:text-xs' placeholder='Search...' />
-                <div className='relative bg-prime h-[26px] -ml-2 border border-prime flex items-center justify-center px-2 rounded-e-md'>
+                <input 
+                    onChange={(e) => handleSearchTextChange(e.target.value)} 
+                    type="text" 
+                    className='max-w-[160px] rounded-md outline-0 border text-sm border-prime dark:border-gray-600 pl-2 py-0.5 pr-7 placeholder:text-xs bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400' 
+                    placeholder='Search...' 
+                />
+                <div className='relative bg-prime dark:bg-gray-600 h-[26px] -ml-2 border border-prime dark:border-gray-600 flex items-center justify-center px-2 rounded-e-md'>
                     <Search className='w-3 h-3 text-white cursor-pointer' />
-                    <Mic className='absolute top-1.5 -left-5 w-3 h-3 cursor-pointer' />
+                    <Mic className='absolute top-1.5 -left-5 w-3 h-3 cursor-pointer text-gray-600 dark:text-gray-400' />
                 </div>
             </div>
         </div>

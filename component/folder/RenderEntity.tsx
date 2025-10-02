@@ -3,6 +3,7 @@
 import { ContextMenu, EntityCreationStateProps } from "@/types/types";
 import { FileText, FolderIcon, LucideChevronLeft } from "lucide-react";
 import React, { useRef, useState } from "react";
+import { useFile } from "@/contexts/file-context";
 import DynamicInput from "./EntityCreatingInput";
 
 interface EntityRendererProps {
@@ -17,10 +18,21 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
     const { entity, entityCreationsState, setEntityCreationsState, handleOnMenuContext, setContextMenu } = props;
     const { contextMenu, rightMenuClick } = entityCreationsState || {};
     const [isOpen, setIsOpen] = useState(false);
+    const { selectedFile, setSelectedFile, setFileContent, setIsEditing } = useFile();
+    
     const toggleFolder = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsOpen(!isOpen);
     };
+    
+    const handleFileClick = (file: any) => {
+        if (file.type === 'FILE') {
+            setSelectedFile(file);
+            setFileContent(file.note || '');
+            setIsEditing(true);
+        }
+    };
+    
     const parentRef = useRef<HTMLDivElement>(null);
 
     return (
@@ -106,7 +118,12 @@ export default function EntityRenderer({ props }: { props: EntityRendererProps }
                     {!(rightMenuClick === "RENAME" && entity.id === contextMenu?.entity?.id) ? (
                         <p
                             ref={parentRef}
-                            className="flex items-center gap-1 text-black dark:text-white font-medium text-[13px] cursor-pointer"
+                            className={`flex items-center gap-1 font-medium text-[13px] cursor-pointer transition-colors ${
+                                selectedFile?.id === entity.id 
+                                    ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded px-1' 
+                                    : 'text-black dark:text-white hover:text-blue-600 dark:hover:text-blue-400'
+                            }`}
+                            onClick={() => handleFileClick(entity)}
                         >
                             <FileText className="w-4 h-4 text-sky-500 transition-transform group-hover:scale-105" strokeWidth={1.5} />
                             <span className="truncate max-w-[200px]">{entity.fileName}</span>

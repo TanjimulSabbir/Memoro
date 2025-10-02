@@ -13,6 +13,8 @@ export interface File {
   parentId: string | null;
   fileName: string;
   note: string;
+  editorType?: "simple" | "sticky" | "mdx";
+  stickyColor?: string; // used when editorType === 'sticky'
   createdAt: number;
   updatedAt: number;
   type: "FILE";

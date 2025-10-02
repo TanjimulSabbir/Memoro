@@ -4,10 +4,14 @@ import { toast } from "sonner";
 import { deleteEntityRecursive } from "@/db/delete";
 import { AlertTriangle, FileText, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useFile } from "@/contexts/file-context";
 
 export function ConfirmDelete(entity: any) {
     const isFolder = entity?.type === "FOLDER";
     const childCount = isFolder ? entity?.children?.length || 0 : 0;
+    
+    // Get file context to clear selection if deleted file is currently selected
+    const { selectedFile, setSelectedFile } = useFile();
 
     toast.custom(
         (t) => (
@@ -58,6 +62,11 @@ export function ConfirmDelete(entity: any) {
                     <Button
                         onClick={async () => {
                             try {
+                                // If deleting the currently selected file, clear the selection
+                                if (selectedFile?.id === entity.id) {
+                                    setSelectedFile(null);
+                                }
+                                
                                 await deleteEntityRecursive(entity);
                                 toast.success("Deleted successfully ✅");
                             } catch (err) {

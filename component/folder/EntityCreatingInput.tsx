@@ -124,8 +124,13 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
             </p>
             <div className="flex flex-col w-full pl-6">
                 <Input
-                    // defaultValue={entity.type === "FOLDER" ? entity?.folderName : entity?.fileName}
-                    placeholder={rightMenuClick === "CREATE" ? "New folder name" : "New file name"}
+                    placeholder={
+                        rightMenuClick === "RENAME" 
+                            ? `Rename ${entityCreationType === "FOLDER" ? "folder" : "file"}`
+                            : entityCreationType === "FOLDER" 
+                                ? "New folder name" 
+                                : "New file name"
+                    }
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
 
@@ -139,7 +144,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
                         }`}
                 />
                 {error && (
-                    <small className="text-[10px] font-light font-PtSerif text-green-500 mt-1 block">
+                    <small className="text-[10px] font-light font-PtSerif text-red-500 dark:text-red-400 mt-1 block">
                         {error}
                     </small>
                 )}

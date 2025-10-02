@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Domine, PT_Serif } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { FileProvider } from "@/contexts/file-context";
 import "./globals.css";
 
 const ptSerif = PT_Serif({
@@ -35,7 +36,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <FileProvider>
+            {children}
+          </FileProvider>
         </ThemeProvider>
       </body>
     </html>

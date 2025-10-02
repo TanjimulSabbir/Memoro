@@ -1,5 +1,6 @@
 import { EntityCreationStateProps, EntityCreationType, RightMenuClick } from '@/types/types';
 import { ConfirmDelete } from '@/utils/ConfirmationButton';
+import { useFile } from '@/contexts/file-context';
 import {
     Download,
     FilePlus,
@@ -20,8 +21,15 @@ interface ContextMenuProps {
 
 export default function ContextMenu({ entityCreationsState, setEntityCreationsState }: ContextMenuProps) {
     const { contextMenu } = entityCreationsState || {};
+    const { setSelectedFile, setFileContent, setIsEditing } = useFile();
 
     if (!contextMenu?.entity) return null;
+
+    // Compute a viewport-clamped position so the menu doesn't overflow the screen
+    const MENU_WIDTH = 240; // px, conservative width
+    const MENU_HEIGHT = 300; // px, conservative height
+    const safeX = Math.max(0, Math.min(contextMenu.x, (typeof window !== 'undefined' ? window.innerWidth : 0) - MENU_WIDTH));
+    const safeY = Math.max(0, Math.min(contextMenu.y, (typeof window !== 'undefined' ? window.innerHeight : 0) - MENU_HEIGHT));
 
     const handleMenuClick = (menuType: RightMenuClick, entityCreationType?: EntityCreationType) => {
         switch (menuType) {
@@ -59,7 +67,11 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
                 console.log("Share");
                 break;
             case "OPEN":
-                console.log("Open");
+                if (contextMenu.entity?.type === "FILE") {
+                    setSelectedFile(contextMenu.entity);
+                    setFileContent(contextMenu.entity.note || '');
+                    setIsEditing(true);
+                }
                 break;
             case "DOWNLOAD":
                 console.log("Download");
@@ -76,8 +88,9 @@ export default function ContextMenu({ entityCreationsState, setEntityCreationsSt
 
     return (
         <div
-            className="absolute z-50"
-            style={{ top: contextMenu.y, left: contextMenu.x }}
+            className="fixed z-50"
+            style={{ top: safeY, left: safeX }}
+            onContextMenu={(e) => e.preventDefault()}
         >
             <ul className="w-60 bg-white dark:bg-neutral-900 dark:text-neutral-200 rounded-xl shadow-xl border border-gray-200 dark:border-neutral-700 py-2 animate-fadeIn z">
 
