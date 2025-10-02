@@ -77,7 +77,7 @@ export default function SideBar() {
     console.log(entityCreationsState, "entityCreationsState from sidebar");
 
     return (
-        <div className="relative w-full max-w-[280px] border-r border-prime px-3 min-h-screen">
+        <div className="relative w-full max-w-[280px] border-r border-prime dark:border-gray-700 px-3 min-h-screen bg-gray-50 dark:bg-transparent transition-colors">
             <TopBox
                 props={{
                     entityCreationsState,

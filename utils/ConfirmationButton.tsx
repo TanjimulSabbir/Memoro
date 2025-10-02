@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { deleteEntityRecursive } from "@/db/delete";
 import { AlertTriangle, FileText, Folder } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ListButton } from "@/components/tiptap-ui/list-button";
 
 export function ConfirmDelete(entity: any) {
     const isFolder = entity?.type === "FOLDER";
@@ -51,7 +50,7 @@ export function ConfirmDelete(entity: any) {
                 {/* Actions */}
                 <div className="flex justify-end gap-4 mt-6">
                     <Button variant="outline"
-                        onClick={() => toast.dismiss(t.id)}
+                        onClick={() => toast.dismiss(t)}
                         className="px-5 py-2 rounded-lg border border-gray-300 dark:border-neutral-700 text-sm font-medium hover:bg-gray-100 cursor-pointer dark:hover:bg-neutral-800 transition-colors"
                     >
                         Cancel
@@ -64,7 +63,7 @@ export function ConfirmDelete(entity: any) {
                             } catch (err) {
                                 toast.error("Failed to delete ❌");
                             } finally {
-                                toast.dismiss(t.id);
+                                toast.dismiss(t);
                             }
                         }}
                         className="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium shadow-md transition-colors cursor-pointer flex items-center gap-2"

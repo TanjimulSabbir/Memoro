@@ -67,7 +67,7 @@ const EntityCreatingInput = ({ props }: { props: DynamicInputProps }) => {
         const childLevelCheck = entity?.children;
         if (childLevelCheck?.length) {
             console.log("Child level check:", childLevelCheck);
-            childrenLevel = childLevelCheck.some(item => normalize(getEntityName(item)) === targetName);
+            childrenLevel = childLevelCheck.some((item: any) => normalize(getEntityName(item)) === targetName);
         }
         return parentLevel || siblingsLevel || childrenLevel;
     };

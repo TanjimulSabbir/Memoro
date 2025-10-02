@@ -6,14 +6,13 @@ import { Toaster } from "@/components/ui/sonner";
 
 export default function Home() {
   return (
-    <div>
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <Header />
       <div className="container max-w-screen-2xl mx-auto flex gap-x-10">
         <SideBar />
         <TextBody />
         <Toaster position="top-center" expand={true} richColors />
       </div>
-    
     </div>
   );
 }

@@ -3,12 +3,12 @@ import { EntityCreationStateProps } from "@/types/types";
 // ✅ update create entity type
 export const handleEntityCreationState = (
     entityCreationProps: EntityCreationStateProps,
-    set
-  clearEntityCreationState?: boolean
+    set: (value: EntityCreationStateProps | null) => void,
+    clearEntityCreationState?: boolean
 ) => {
   if (clearEntityCreationState) {
-    entityCreationProps.(null);
+    set(null);
   } else {
-    setEntityCreationsState({ ...entityCreationProps });
+    set({ ...entityCreationProps });
   }
 };
